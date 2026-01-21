@@ -1,4 +1,8 @@
 <?php
+session_start();
+
+// Inkluder emnedata
+require_once 'emne_db.php';
 
 // Simuler innlogget bruker (sett til null for å teste utlogget tilstand)
 $_SESSION['user'] = [
@@ -9,10 +13,8 @@ $_SESSION['user'] = [
 // Hent nåværende side
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'emne';
 
-// Eksempel emnedata
-$emner = [
-    ['kode' => 'xxx100', 'navn' => 'xxx'],
-];
+// Hent alle emner fra data-filen
+$alleEmner = hentAlleEmner();
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -27,10 +29,12 @@ $emner = [
 <body>
     <!-- HEADER -->
     <header>
-        <div class="logo">StudiePortal</div>
+        <a href="guest_hjemmeside.php">
+            <div class="logo">StudiePortal</div>
+        </a>
 
         <nav>
-            <a href="?page=emne" class="<?php echo $currentPage === 'emne' ? 'active' : ''; ?>">Emner</a>
+            <a href="?page=emne" class="<?php echo $currentPage === 'emne' ? 'active' :  ''; ?>">Emner</a>
             <a href="?page=meldinger" class="<?php echo $currentPage === 'meldinger' ?  'active' : ''; ?>">Meldinger</a>
         </nav>
 
@@ -55,10 +59,12 @@ $emner = [
         <h1>Emneoversikt</h1>
 
         <div class="emne-liste">
-            <?php foreach ($emner as $emne): ?>
+            <?php foreach ($alleEmner as $emne): ?>
                 <div class="emne-kort">
-                    <span class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></span>
-                    <span class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></span>
+                    <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>">
+                        <span class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></span>
+                        <span class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></span>
+                    </a>
                 </div>
             <?php endforeach; ?>
         </div>
