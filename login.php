@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Registeringsside</title>
 </head>
 <body>
@@ -15,7 +16,7 @@
     </nav>
 
     <div class="user-section">
-        <span class="current-page"><?php echo ucfirst($currentPage); ?></span>
+       
 
         <?php if (isset($_SESSION['user'])): ?>
             <!-- Innlogget bruker -->
