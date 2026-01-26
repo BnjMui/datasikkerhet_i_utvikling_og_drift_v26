@@ -234,13 +234,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rapporter_id'])) {
 
     <script>
         function openReportModal(meldingId, studentNavn) {
-            document.getElementById('reportModal').classList.add('active');
+            document.getElementById('reportModal').removeAttribute('hidden');
             document.getElementById('reportMeldingId').value = meldingId;
             document.getElementById('reportStudentName').textContent = studentNavn;
         }
 
         function closeReportModal() {
-            document.getElementById('reportModal').classList.remove('active');
+            document.getElementById('reportModal').setAttribute('hidden', '');
         }
 
         document.getElementById('reportModal').addEventListener('click', function(e) {
