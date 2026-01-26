@@ -1,0 +1,24 @@
+CREATE TABLE IF NOT EXISTS users (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(50),
+	mail VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS students (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	-- fk here
+	study_field VARCHAR(255),
+	class_year INT
+);
+
+CREATE TABLE IF NOT EXISTS lecturers (
+	id INT AUTO_INCREMENT PRIMARY KEY
+	-- fk here
+);
+
+CREATE TABLE IF NOT EXISTS course (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	lecturer_id INT -- FK HERE,
+);
+
+
