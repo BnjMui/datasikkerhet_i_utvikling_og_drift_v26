@@ -28,57 +28,32 @@ $alleEmner = hentAlleEmner();
 
 <body>
     <!-- HEADER -->
-    <header>
-        <a href="guest_hjemmeside.php">
-            <div class="logo">StudiePortal</div>
-        </a>
+    <?php
 
-        <nav>
-            <a href="?page=emne" class="<?php echo $currentPage === 'emne' ? 'active' :  ''; ?>">Emner</a>
-            <a href="?page=meldinger" class="<?php echo $currentPage === 'meldinger' ?  'active' : ''; ?>">Meldinger</a>
-        </nav>
+    $currentPage = $_GET['page'] ?? 'emne'; // eller hva som passer
 
-        <div class="user-section">
-            <span class="current-page"><?php echo ucfirst($currentPage); ?></span>
-
-            <?php if (isset($_SESSION['user'])): ?>
-                <!-- Innlogget bruker -->
-                <div class="user-profile">
-                    <span><?php echo htmlspecialchars($_SESSION['user']['name']); ?></span>
-                </div>
-                <a href="? logout=1" class="login-btn">Logg ut</a>
-            <?php else: ?>
-                <!-- Ikke innlogget -->
-                <a href="login.php" class="login-btn">Logg inn</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    include __DIR__ . '/header.php'; // trygg måte (absolutt sti)
+    ?>
 
     <!-- MAIN CONTENT -->
     <main>
         <h1>Emneoversikt</h1>
 
-        <div class="emne-liste">
-            <?php foreach ($alleEmner as $emne): ?>
-                <div class="emne-kort">
-                    <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>">
-                        <span class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></span>
-                        <span class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></span>
-                    </a>
-                </div>
-            <?php endforeach; ?>
-        </div>
+        <nav aria-label="Emner">
+            <ul class="emne-liste">
+                <?php foreach ($alleEmner as $emne): ?>
+                    <li class="emne-kort">
+                        <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>">
+                            <span class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></span>
+                            <span class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </nav>
     </main>
 
-    <!-- FOOTER -->
-    <footer>
-        <p>
-            Kontakt oss: <a href="mailto:kontakt@studieportal.no">kontakt@studieportal.no</a>
-        </p>
-        <p class="copyright">
-            &copy; <?php echo date('Y'); ?> StudiePortal. Alle rettigheter reservert.
-        </p>
-    </footer>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

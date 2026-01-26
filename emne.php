@@ -41,71 +41,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
 </head>
 
 <body>
-    <header>
-        <a href="guest_hjemmeside.php">
-            <div class="logo">StudiePortal</div>
-        </a>
+    <!-- HEADER -->
+    <?php
 
-        <nav>
-            <a href="guest_hjemmeside.php" class="<?php echo $currentPage === 'emne' ? 'active' : ''; ?>">Emner</a>
-            <a href="? page=meldinger" class="<?php echo $currentPage === 'meldinger' ?  'active' : ''; ?>">Meldinger</a>
-        </nav>
+    $currentPage = $_GET['page'] ?? 'emne'; // eller hva som passer
 
-        <div class="user-section">
-            <span class="current-page"><?php echo ucfirst($currentPage); ?></span>
-
-            <?php if (isset($_SESSION['user'])): ?>
-                <!-- Innlogget bruker -->
-                <div class="user-profile">
-                    <span><?php echo htmlspecialchars($_SESSION['user']['name']); ?></span>
-                </div>
-                <a href="? logout=1" class="login-btn">Logg ut</a>
-            <?php else: ?>
-                <!-- Ikke innlogget -->
-                <a href="login.php" class="login-btn">Logg inn</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    include __DIR__ . '/header.php'; // trygg måte (absolutt sti)
+    ?>
 
     <main>
         <?php if ($emne): ?>
-            <!-- Vis valgt emne øverst -->
-            <div class="emne-header">
-                <span class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></span>
+            <!-- Toppinfo om valgt emne -->
+            <section class="emne-header">
+                <p class="emne-kode">
+                    <?php echo htmlspecialchars(strtoupper($emne['kode'])); ?>
+                </p>
                 <h1><?php echo htmlspecialchars($emne['navn']); ?></h1>
-            </div>
+            </section>
 
-            <!-- PIN-kode seksjon -->
-            <div class="pin-section">
-                <h2>🔒 Skriv inn PIN-kode</h2>
+            <!-- PIN-kode / tilgang -->
+            <section class="pin-section" aria-labelledby="pin-title">
+                <h2 id="pin-title">🔒 Skriv inn PIN-kode</h2>
                 <p>Skriv inn PIN-koden for å få tilgang til emneinnholdet</p>
 
                 <form method="POST">
+                    <label for="pin" class="visually-hidden">PIN-kode</label>
                     <input
+                        id="pin"
                         type="password"
                         name="pin"
                         class="pin-input"
                         maxlength="4"
                         placeholder="••••"
                         pattern="[0-9]{4}"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
                         required
                         autofocus>
-                    <br>
+
                     <button type="submit" class="pin-btn">Gå videre</button>
 
                     <?php if ($pinFeil): ?>
-                        <p class="error-message">❌ Feil PIN-kode. Prøv igjen.</p>
+                        <p class="error-message" role="alert">❌ Feil PIN-kode. Prøv igjen.</p>
                     <?php endif; ?>
                 </form>
-            </div>
+            </section>
         <?php else: ?>
-            <div class="pin-section">
-                <h2>Emne ikke funnet</h2>
-                <p>Beklager, vi fant ikke emnet du leter etter. </p>
-                <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
-            </div>
+            <section class="pin-section" aria-labelledby="not-found-title">
+                <h1 id="not-found-title">Emne ikke funnet</h1>
+                <p>Beklager, vi fant ikke emnet du leter etter.</p>
+                <p>
+                    <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
+                </p>
+            </section>
         <?php endif; ?>
     </main>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

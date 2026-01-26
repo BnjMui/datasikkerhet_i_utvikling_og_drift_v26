@@ -71,127 +71,164 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rapporter_id'])) {
 </head>
 
 <body>
-    <header>
-        <a href="guest_hjemmeside.php">
-            <div class="logo">StudiePortal</div>
-        </a>
+    <!-- HEADER -->
+    <?php
 
-        <nav>
-            <a href="guest_hjemmeside.php" class="<?php echo $currentPage === 'emne' ? 'active' : ''; ?>">Emner</a>
-            <a href="?page=meldinger" class="<?php echo $currentPage === 'meldinger' ?  'active' : ''; ?>">Meldinger</a>
-        </nav>
+    $currentPage = $_GET['page'] ?? 'emne'; // eller hva som passer
 
-        <div class="user-section">
-            <span class="current-page"><?php echo ucfirst($currentPage); ?></span>
-
-            <?php if (isset($_SESSION['user'])): ?>
-                <div class="user-profile">
-                    <span><?php echo htmlspecialchars($_SESSION['user']['name']); ?></span>
-                </div>
-                <a href="? logout=1" class="login-btn">Logg ut</a>
-            <?php else: ?>
-                <a href="login. php" class="login-btn">Logg inn</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    include __DIR__ . '/header.php'; // trygg måte (absolutt sti)
+    ?>
 
     <main>
         <?php if ($emne): ?>
             <!-- Emne header med foreleser info -->
-            <div class="emne-header">
+            <section class="emne-header" aria-labelledby="emne-title">
                 <div class="emne-info">
-                    <span class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></span>
-                    <h1><?php echo htmlspecialchars($emne['navn']); ?></h1>
+                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></p>
+                    <h1 id="emne-title"><?php echo htmlspecialchars($emne['navn']); ?></h1>
                 </div>
 
-                <div class="foreleser-kort">
-                    <img src="<?php echo htmlspecialchars($emne['foreleser']['bilde']); ?>" alt="Foreleser">
+                <article class="foreleser-kort" aria-label="Foreleser">
+                    <img src="<?php echo htmlspecialchars($emne['foreleser']['bilde']); ?>"
+                        alt="Portrett av <?php echo htmlspecialchars($emne['foreleser']['navn']); ?>">
+
                     <div class="foreleser-info">
-                        <span class="label">Foreleser</span>
-                        <div class="navn"><?php echo htmlspecialchars($emne['foreleser']['navn']); ?></div>
-                        <div class="email"><?php echo htmlspecialchars($emne['foreleser']['email']); ?></div>
+                        <p class="label">Foreleser</p>
+                        <p class="navn"><?php echo htmlspecialchars($emne['foreleser']['navn']); ?></p>
+                        <p class="email">
+                            <a href="mailto:<?php echo htmlspecialchars($emne['foreleser']['email']); ?>">
+                                <?php echo htmlspecialchars($emne['foreleser']['email']); ?>
+                            </a>
+                        </p>
                     </div>
-                </div>
-            </div>
+                </article>
+            </section>
 
             <!-- Meldinger seksjon -->
-            <div class="meldinger-header">
-                <h2>Meldinger</h2>
-                <span class="melding-count"><?php echo count($meldinger); ?> meldinger</span>
-            </div>
+            <section class="meldinger" aria-labelledby="meldinger-title">
+                <section class="meldinger-header">
+                    <h2 id="meldinger-title">Meldinger</h2>
+                    <p class="melding-count"><?php echo count($meldinger); ?> meldinger</p>
+                </section>
 
-            <?php foreach ($meldinger as $melding): ?>
-                <div class="melding-kort">
-                    <div class="melding-header">
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                <?php echo strtoupper(substr($melding['student'], 0, 1)); ?>
-                            </div>
-                            <div>
-                                <div class="student-navn"><?php echo htmlspecialchars($melding['student']); ?></div>
-                                <div class="melding-dato"><?php echo htmlspecialchars($melding['dato']); ?></div>
-                            </div>
-                        </div>
-                        <button class="rapporter-btn" onclick="openReportModal(<?php echo $melding['id']; ?>, '<?php echo htmlspecialchars($melding['student']); ?>')">
-                            Rapporter
-                        </button>
-                    </div>
-
-                    <div class="melding-innhold">
-                        <?php echo htmlspecialchars($melding['innhold']); ?>
-                    </div>
-
-                    <!-- Eksisterende kommentarer -->
-                    <?php if (!empty($melding['kommentarer'])): ?>
-                        <div class="kommentarer">
-                            <?php foreach ($melding['kommentarer'] as $kommentar): ?>
-                                <div class="kommentar">
-                                    <div class="kommentar-forfatter"><?php echo htmlspecialchars($kommentar['forfatter']); ?></div>
-                                    <div class="kommentar-tekst"><?php echo htmlspecialchars($kommentar['tekst']); ?></div>
-                                    <div class="kommentar-dato"><?php echo htmlspecialchars($kommentar['dato']); ?></div>
+                <?php foreach ($meldinger as $melding): ?>
+                    <article class="melding-kort" aria-labelledby="melding-<?php echo $melding['id']; ?>-title">
+                        <section class="melding-header">
+                            <div class="student-info">
+                                <div class="student-avatar" aria-hidden="true">
+                                    <?php echo strtoupper(substr($melding['student'], 0, 1)); ?>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
 
-                    <!-- Legg til kommentar -->
-                    <form class="kommentar-form" method="POST">
-                        <input type="hidden" name="melding_id" value="<?php echo $melding['id']; ?>">
-                        <input type="text" name="kommentar" class="kommentar-input" placeholder="Skriv en kommentar..." required>
-                        <button type="submit" class="kommentar-btn">Send</button>
-                    </form>
-                </div>
-            <?php endforeach; ?>
+                                <div>
+                                    <h3 id="melding-<?php echo $melding['id']; ?>-title" class="student-navn">
+                                        <?php echo htmlspecialchars($melding['student']); ?>
+                                    </h3>
 
-            <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
+                                    <time class="melding-dato" datetime="<?php echo htmlspecialchars($melding['dato']); ?>">
+                                        <?php echo htmlspecialchars($melding['dato']); ?>
+                                    </time>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="rapporter-btn"
+                                onclick="openReportModal(<?php echo $melding['id']; ?>, '<?php echo htmlspecialchars($melding['student']); ?>')">
+                                Rapporter
+                            </button>
+                        </section>
+
+                        <p class="melding-innhold">
+                            <?php echo htmlspecialchars($melding['innhold']); ?>
+                        </p>
+
+                        <!-- Eksisterende kommentarer -->
+                        <?php if (!empty($melding['kommentarer'])): ?>
+                            <section class="kommentarer" aria-label="Kommentarer">
+                                <ul class="kommentar-liste">
+                                    <?php foreach ($melding['kommentarer'] as $kommentar): ?>
+                                        <li class="kommentar">
+                                            <p class="kommentar-forfatter">
+                                                <?php echo htmlspecialchars($kommentar['forfatter']); ?>
+                                            </p>
+                                            <p class="kommentar-tekst">
+                                                <?php echo htmlspecialchars($kommentar['tekst']); ?>
+                                            </p>
+                                            <time class="kommentar-dato" datetime="<?php echo htmlspecialchars($kommentar['dato']); ?>">
+                                                <?php echo htmlspecialchars($kommentar['dato']); ?>
+                                            </time>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </section>
+                        <?php endif; ?>
+
+                        <!-- Legg til kommentar -->
+                        <form class="kommentar-form" method="POST">
+                            <input type="hidden" name="melding_id" value="<?php echo $melding['id']; ?>">
+
+                            <label for="kommentar-<?php echo $melding['id']; ?>" class="visually-hidden">
+                                Skriv en kommentar til melding fra <?php echo htmlspecialchars($melding['student']); ?>
+                            </label>
+                            <input
+                                id="kommentar-<?php echo $melding['id']; ?>"
+                                type="text"
+                                name="kommentar"
+                                class="kommentar-input"
+                                placeholder="Skriv en kommentar..."
+                                required>
+
+                            <button type="submit" class="kommentar-btn">Send</button>
+                        </form>
+                    </article>
+                <?php endforeach; ?>
+            </section>
+
+            <nav aria-label="Tilbake">
+                <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
+            </nav>
 
         <?php else: ?>
-            <div class="pin-section">
-                <h2>Emne ikke funnet</h2>
-                <p>Beklager, vi fant ikke emnet du leter etter. </p>
-                <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
-            </div>
+            <section class="pin-section" aria-labelledby="not-found-title">
+                <h1 id="not-found-title">Emne ikke funnet</h1>
+                <p>Beklager, vi fant ikke emnet du leter etter.</p>
+
+                <nav aria-label="Tilbake">
+                    <a href="guest_hjemmeside.php" class="back-link">← Tilbake til emneoversikt</a>
+                </nav>
+            </section>
         <?php endif; ?>
     </main>
 
-    <!-- Rapport Modal -->
-    <div class="modal-overlay" id="reportModal">
-        <div class="modal">
-            <h3>Rapporter melding</h3>
-            <p>Du rapporterer en melding fra <strong id="reportStudentName"></strong></p>
+    <?php include 'footer.php'; ?>
+
+    <!-- Rapport Modal (dialog) -->
+    <div class="modal-overlay" id="reportModal" hidden>
+        <section
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="report-title"
+            aria-describedby="report-desc">
+            <h2 id="report-title">Rapporter melding</h2>
+            <p id="report-desc">Du rapporterer en melding fra <strong id="reportStudentName"></strong></p>
+
             <form method="POST">
                 <input type="hidden" name="rapporter_id" id="reportMeldingId">
-                <textarea name="rapport_grunn" placeholder="Beskriv hvorfor denne meldingen er upassende..." required></textarea>
+
+                <label for="rapport_grunn" class="visually-hidden">Begrunnelse</label>
+                <textarea id="rapport_grunn" name="rapport_grunn" placeholder="Beskriv hvorfor denne meldingen er upassende..." required></textarea>
+
                 <div class="modal-actions">
                     <button type="button" class="modal-cancel" onclick="closeReportModal()">Avbryt</button>
                     <button type="submit" class="modal-submit">Send rapport</button>
                 </div>
             </form>
-        </div>
+        </section>
     </div>
 
     <!-- Suksess toast -->
-    <div class="success-toast" id="successToast">
+    <div class="success-toast" id="successToast" role="status" aria-live="polite" hidden>
         ✓ Handlingen ble utført!
     </div>
 
