@@ -7,9 +7,9 @@ $emner = [
         'navn' => 'Innføring i programmering',
         'pin' => '1234',
         'foreleser' => [
-            'navn' => 'Professor Kari Hansen',
-            'bilde' => 'https://via.placeholder.com/100x100? text=KH',
-            'email' => 'kari.hansen@universitet.no'
+            'navn' => 'Tom Heinert',
+            'bilde' => 'https://via.placeholder.com/100x100?text=TH',
+            'email' => 'tom.heinert@hiof.no'
         ]
     ],
     [
@@ -17,9 +17,9 @@ $emner = [
         'navn' => 'Databaser',
         'pin' => '5678',
         'foreleser' => [
-            'navn' => 'Professor Ole Berg',
+            'navn' => 'Ole Berg',
             'bilde' => 'https://via.placeholder.com/100x100?text=OB',
-            'email' => 'ole.berg@universitet.no'
+            'email' => 'ole.berg@hiof.no'
         ]
     ],
     [
@@ -27,9 +27,9 @@ $emner = [
         'navn' => 'Matematikk 1',
         'pin' => '9012',
         'foreleser' => [
-            'navn' => 'Professor Lisa Vik',
+            'navn' => 'Lisa Vik',
             'bilde' => 'https://via.placeholder.com/100x100?text=LV',
-            'email' => 'lisa. vik@universitet.no'
+            'email' => 'lisa.vik@hiof.no'
         ]
     ],
 ];
@@ -66,5 +66,89 @@ function sjekkEmnePin($kode, $pin)
     if ($emne && $emne['pin'] === $pin) {
         return true;
     }
+    return false;
+}
+
+/**
+ * Sjekk om en foreleser har tilgang til et emne
+ */
+function harForeleserTilgang($emneKode, $foreleserEmail)
+{
+    $emne = finnEmne($emneKode);
+    if ($emne && isset($emne['foreleser']['email'])) {
+        return strtolower($emne['foreleser']['email']) === strtolower($foreleserEmail);
+    }
+    return false;
+}
+
+/**
+ * Hent meldinger for et emne (med svar)
+ */
+function hentMeldinger($emneKode)
+{
+    if (!isset($_SESSION['meldinger'])) {
+        $_SESSION['meldinger'] = [];
+    }
+
+    $meldinger = [];
+    foreach ($_SESSION['meldinger'] as $melding) {
+        if (strtoupper($melding['emne_kode']) === strtoupper($emneKode)) {
+            $meldinger[] = $melding;
+        }
+    }
+
+    // Sorter etter dato (nyeste først)
+    usort($meldinger, function ($a, $b) {
+        return strtotime($b['dato']) - strtotime($a['dato']);
+    });
+
+    return $meldinger;
+}
+
+/**
+ * Legg til en ny melding fra student
+ */
+function leggTilMelding($emneKode, $innhold)
+{
+    if (!isset($_SESSION['meldinger'])) {
+        $_SESSION['meldinger'] = [];
+    }
+
+    // Generer en unik ID
+    $id = count($_SESSION['meldinger']) + 1;
+
+    $nyMelding = [
+        'id' => $id,
+        'emne_kode' => $emneKode,
+        'innhold' => $innhold,
+        'dato' => date('Y-m-d H:i:s'),
+        'svar' => null
+    ];
+
+    $_SESSION['meldinger'][] = $nyMelding;
+
+    return $id;
+}
+
+/**
+ * Legg til svar fra foreleser på en melding
+ */
+function leggTilSvar($emneKode, $meldingId, $svarTekst, $foreleserNavn)
+{
+    if (!isset($_SESSION['meldinger'])) {
+        return false;
+    }
+
+    foreach ($_SESSION['meldinger'] as &$melding) {
+        if ($melding['id'] == $meldingId && strtoupper($melding['emne_kode']) === strtoupper($emneKode)) {
+            $melding['svar'] = [
+                'tekst' => $svarTekst,
+                'forfatter' => $foreleserNavn,
+                'dato' => date('Y-m-d H:i:s')
+            ];
+            return true;
+        }
+    }
+
     return false;
 }

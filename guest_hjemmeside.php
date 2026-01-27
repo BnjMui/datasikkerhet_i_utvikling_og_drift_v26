@@ -1,20 +1,25 @@
 <?php
 session_start();
 
-// Inkluder emnedata
+// Inkluder emnedata og brukerdata
 require_once 'emne_db.php';
+require_once 'bruker_db.php';
 
-// Simuler innlogget bruker (sett til null for å teste utlogget tilstand)
-$_SESSION['user'] = [
-    'name' => 'Ola Nordmann',
-    'email' => 'ola@example.com',
-];
+// Hent brukerinfo fra session
+$bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+$rolle = ($bruker && isset($bruker['rolle'])) ? $bruker['rolle'] : 'guest';
 
 // Hent nåværende side
-$currentPage = isset($_GET['page']) ? $_GET['page'] : 'emne';
+$currentPage = 'Hjemmeside';
 
-// Hent alle emner fra data-filen
-$alleEmner = hentAlleEmner();
+// Hent emner basert på rolle
+if ($rolle === 'foreleser') {
+    // Foreleser ser kun egne emner
+    $alleEmner = hentForeleserEmner($bruker['email']);
+} else {
+    // Guest og student ser alle emner
+    $alleEmner = hentAlleEmner();
+}
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -22,35 +27,68 @@ $alleEmner = hentAlleEmner();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Min Side - <?php echo ucfirst($currentPage); ?></title>
+    <title>Emneoversikt - Emneportal</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <!-- HEADER -->
-    <?php
+    <?php include __DIR__ . '/header.php'; ?>
 
-    $currentPage = $_GET['page'] ?? 'emne'; // eller hva som passer
-
-    include __DIR__ . '/header.php'; // trygg måte (absolutt sti)
-    ?>
-
-    <!-- MAIN CONTENT -->
     <main>
-        <h1>Emneoversikt</h1>
+        <header class="page-header">
+            <h1>Emneoversikt</h1>
 
-        <nav aria-label="Emner">
-            <ul class="emne-liste">
-                <?php foreach ($alleEmner as $emne): ?>
-                    <li class="emne-kort">
-                        <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>">
-                            <span class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></span>
-                            <span class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></span>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </nav>
+            <?php if ($rolle === 'foreleser'): ?>
+                <p class="rolle-info">
+                    <span aria-hidden="true"></span>
+                    Du ser kun emner du underviser i.
+                </p>
+            <?php elseif ($rolle === 'student'): ?>
+                <p class="rolle-info">
+                    <span aria-hidden="true"></span>
+                    Som student kan du sende anonyme meldinger til alle emner.
+                </p>
+            <?php else: ?>
+                <p class="rolle-info">
+                    <span aria-hidden="true"></span>
+                    Du er ikke innlogget. <a href="login.php">Logg inn</a> for flere funksjoner.
+                </p>
+            <?php endif; ?>
+        </header>
+
+        <section aria-labelledby="emne-liste-title">
+            <h2 id="emne-liste-title" class="visually-hidden">Liste over emner</h2>
+
+            <?php if (empty($alleEmner)): ?>
+                <p class="ingen-emner">
+                    <strong>Ingen emner å vise.</strong>
+                    Du har ingen emner tilknyttet din brukerkonto.
+                </p>
+            <?php else: ?>
+                <nav aria-label="Emner">
+                    <ul class="emne-liste">
+                        <?php foreach ($alleEmner as $emne): ?>
+                            <li>
+                                <article class="emne-kort">
+                                    <?php if ($rolle === 'guest'): ?>
+                                        <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>"
+                                            aria-label="<?php echo htmlspecialchars($emne['kode'] . ' - ' . $emne['navn']); ?>">
+                                        <?php else: ?>
+                                            <a href="guest_meldinger.php?kode=<?php echo urlencode($emne['kode']); ?>"
+                                                aria-label="<?php echo htmlspecialchars($emne['kode'] . ' - ' . $emne['navn']); ?>">
+                                            <?php endif; ?>
+                                            <header>
+                                                <h3 class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></h3>
+                                            </header>
+                                            <p class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></p>
+                                            </a>
+                                </article>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+            <?php endif; ?>
+        </section>
     </main>
 
     <?php include 'footer.php'; ?>
