@@ -1,1 +1,0 @@
-# datasikkerhet_i_utvikling_og_drift_v26
