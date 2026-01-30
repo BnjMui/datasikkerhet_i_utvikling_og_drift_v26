@@ -10,13 +10,25 @@ if (isset($_SESSION['user']) && isset($_SESSION['user']['rolle'])) {
 }
 
 $feilmelding = '';
+$suksessmelding = '';
+
+// Hent success meldinger fra GET
+if (isset($_GET['success'])) {
+    $suksessmelding = 'Registrering vellykket! Logg inn med dine opplysninger.';
+}
 
 // Håndter innlogging
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $brukernavn = isset($_POST['brukernavn']) ? trim($_POST['brukernavn']) : '';
+    $input = isset($_POST['brukernavn']) ? trim($_POST['brukernavn']) : '';
     $passord = isset($_POST['passord']) ? $_POST['passord'] : '';
 
-    $bruker = finnBruker($brukernavn, $passord);
+    // Prøv først med brukernavn (for eksisterende brukere)
+    $bruker = finnBruker($input, $passord);
+
+    // Hvis ikke funnet, prøv med email (for nye registrerte brukere)
+    if (!$bruker) {
+        $bruker = finnBrukerMedEmailOgPassord($input, $passord);
+    }
 
     if ($bruker) {
         // Regenerer session ID for sikkerhet
@@ -26,13 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'id' => $bruker['id'],
             'navn' => $bruker['navn'],
             'email' => $bruker['email'],
-            'rolle' => $bruker['rolle']
+            'rolle' => $bruker['rolle'],
+            'bilde' => isset($bruker['bilde']) ? $bruker['bilde'] : null
         ];
 
         header('Location: guest_hjemmeside.php');
         exit;
     } else {
-        $feilmelding = 'Feil brukernavn eller passord.';
+        $feilmelding = 'Feil brukernavn/e-post eller passord.';
     }
 }
 
@@ -57,15 +70,21 @@ $rolle = 'guest';
         <article class="login-container">
             <header>
                 <h1 id="login-title">Logg inn</h1>
-                <p>Logg inn som student eller foreleser</p>
+                <p>Logg inn som student eller veileder</p>
             </header>
+
+            <?php if ($suksessmelding): ?>
+                <p class="success-message" role="status">
+                    <?php echo htmlspecialchars($suksessmelding); ?>
+                </p>
+            <?php endif; ?>
 
             <form method="POST" aria-labelledby="login-title">
                 <fieldset>
                     <legend class="visually-hidden">Innloggingsinformasjon</legend>
 
                     <p class="form-group">
-                        <label for="brukernavn">Brukernavn</label>
+                        <label for="brukernavn">Brukernavn eller E-post</label>
                         <input
                             id="brukernavn"
                             type="text"
@@ -94,6 +113,10 @@ $rolle = 'guest';
                     </p>
                 <?php endif; ?>
             </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <p>Har du ikke en konto? <a href="register.php" style="color: #008CBA; text-decoration: none;">Registrer deg her</a></p>
+            </div>
         </article>
     </main>
 
