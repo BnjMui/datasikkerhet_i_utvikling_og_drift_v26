@@ -37,11 +37,17 @@ function create_user($username, $password, $type, $user_data) {
 function create_course($course_name, $course_pin) {
 }
 
+function get_all_courses() {
+}
+
 function get_courses($user_id) {
     // Return all courses if no user_id is provided
 }
 
 function get_course($course_id) {
+}
+
+function authenticate_course($user_id, $course_pin) {
 }
 
 function create_message ($course_id, $text_content) {
