@@ -79,7 +79,7 @@ function finnBrukerMedEmail($email)
  * Registrer ny bruker (student eller lecturer)
  * Lagrer data i en JSON-fil siden det ikke er en riktig database
  */
-function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture = null)
+function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture = null, $studieretning = null, $studiekull = null, $emne = null)
 {
     global $brukere;
 
@@ -107,6 +107,17 @@ function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassw
         'bilde' => $picture,
         'registrert_dato' => date('Y-m-d H:i:s')
     ];
+
+    // Legg til studentspesifikke felt hvis bruker er student
+    if ($user_type === 'student') {
+        $ny_bruker['studieretning'] = $studieretning;
+        $ny_bruker['studiekull'] = (int)$studiekull;
+    }
+
+    // Legg til forelesersspesifikke felt hvis bruker er foreleser
+    if ($user_type === 'lecturer') {
+        $ny_bruker['emne'] = $emne;
+    }
 
     // Legg til i brukere array
     $GLOBALS['brukere'][] = $ny_bruker;
@@ -176,4 +187,52 @@ function hentForeleserEmner($foreleserEmail)
     }
 
     return $foreleserEmner;
+}
+
+/**
+ * Finn bruker basert på bruker-ID
+ */
+function finnBrukerMedId($id)
+{
+    global $brukere;
+    
+    // Først sjekk i memory array
+    foreach ($brukere as $bruker) {
+        if ($bruker['id'] === $id) {
+            return $bruker;
+        }
+    }
+    
+    // Hvis ikke funnet, last fra JSON
+    $registrerteBrukere = lastBrukereJson();
+    foreach ($registrerteBrukere as $bruker) {
+        if ($bruker['id'] === $id) {
+            return $bruker;
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Oppdater passord for bruker
+ */
+function oppdaterPassord($userId, $nyttPassord)
+{
+    global $brukere;
+    
+    $hashedPassword = password_hash($nyttPassord, PASSWORD_DEFAULT);
+    
+    // Oppdater i memory array
+    foreach ($brukere as &$bruker) {
+        if ($bruker['id'] === $userId) {
+            $bruker['passord'] = $hashedPassword;
+            break;
+        }
+    }
+    
+    // Lagre til JSON
+    lagreBrukereJson();
+    
+    return true;
 }

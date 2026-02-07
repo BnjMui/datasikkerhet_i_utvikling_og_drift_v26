@@ -114,9 +114,9 @@ $rolle = 'guest';
                 <?php endif; ?>
             </form>
 
-            <div style="text-align: center; margin-top: 20px;">
+            <input style="text-align: center; margin-top: 20px;">
                 <p>Har du ikke en konto? <a href="register.php" style="color: #008CBA; text-decoration: none;">Registrer deg her</a></p>
-            </div>
+                </input>
         </article>
     </main>
 

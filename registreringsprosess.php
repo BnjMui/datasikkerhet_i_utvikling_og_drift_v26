@@ -9,6 +9,9 @@ $lastname = trim($_POST['lastname'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 $password_confirm = $_POST['password_confirm'] ?? '';
+$studieretning = trim($_POST['studieretning'] ?? '');
+$studiekull = trim($_POST['studiekull'] ?? '');
+$emne = trim($_POST['emne'] ?? '');
 
 // Validering
 $valideringsfeil = [];
@@ -29,12 +32,42 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $valideringsfeil[] = 'Gyldig e-postadresse er påkrevd.';
 }
 
-if (empty($password) || strlen($password) < 6) {
-    $valideringsfeil[] = 'Passord må være minst 6 tegn.';
+// Password validering - påkrevd for students, optional for lecturers
+if ($user_type === 'student') {
+    if (empty($password) || strlen($password) < 6) {
+        $valideringsfeil[] = 'Passord må være minst 6 tegn.';
+    }
+
+    if ($password !== $password_confirm) {
+        $valideringsfeil[] = 'Passordene samsvarer ikke.';
+    }
+} else if ($user_type === 'lecturer') {
+    // Lecturers get a default password if none provided
+    if (empty($password)) {
+        $password = bin2hex(random_bytes(8));
+    } else if (strlen($password) < 6) {
+        $valideringsfeil[] = 'Passord må være minst 6 tegn.';
+    } else if ($password !== $password_confirm) {
+        $valideringsfeil[] = 'Passordene samsvarer ikke.';
+    }
 }
 
-if ($password !== $password_confirm) {
-    $valideringsfeil[] = 'Passordene samsvarer ikke.';
+// Validering av studentspesifikke felt
+if ($user_type === 'student') {
+    if (empty($studieretning) || strlen($studieretning) < 2) {
+        $valideringsfeil[] = 'Studieretning må være minst 2 tegn.';
+    }
+    
+    if (empty($studiekull) || !is_numeric($studiekull) || $studiekull < 2000 || $studiekull > 2100) {
+        $valideringsfeil[] = 'Studiekull må være et gyldig år mellom 2000 og 2100.';
+    }
+}
+
+// Validering av forelesersspesifikke felt
+if ($user_type === 'lecturer') {
+    if (empty($emne)) {
+        $valideringsfeil[] = 'Du må velge et emne du underviser i.';
+    }
 }
 
 // Hvis validering feilet, gå tilbake til register.php med feilmeldinger
@@ -85,7 +118,7 @@ if ($user_type === 'lecturer' && isset($_FILES['picture']) && $_FILES['picture']
 }
 
 // Legg til bruker i bruker_db.php array
-$newUserId = registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture);
+$newUserId = registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture, $studieretning, $studiekull, $emne);
 
 if ($newUserId) {
     // Omdirigerer til login med suksessmelding
