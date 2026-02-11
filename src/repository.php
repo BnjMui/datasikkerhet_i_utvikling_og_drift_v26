@@ -15,12 +15,12 @@ class Repository
     }
 
     # Users
-    public function getUserById(int $id)
+    public function getUserByMail(string $mail)
     {
         $dbh = $this->dbh;
 
-        $statement = $dbh->prepare("SELECT user_id, name, mail, role FROM users WHERE user_id = ?");
-        $statement->execute([$id]);
+        $statement = $dbh->prepare("SELECT user_id, name, mail, role FROM users WHERE mail = ?");
+        $statement->execute([$mail]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         $user = new User($result["user_id"], $result["name"], $result["mail"], $result["role"], "pass");

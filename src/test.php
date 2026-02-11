@@ -9,9 +9,11 @@
         </p>
         <p>
 <?php
-include "server.php";
+include "repository.php";
 
-var_dump(get_users(1));
+            $repository = new Repository();
+
+            echo $repository->getUserById(1);
 ?>
         </p>
     </body>
