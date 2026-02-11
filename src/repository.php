@@ -1,6 +1,7 @@
 <?php
 
 use Entities\User;
+
 include "./entities/user.php";
 include "db.php";
 class Repository
@@ -28,30 +29,55 @@ class Repository
 
     }
 
-    public function createUser(User $userData)
+    public function createUser($uid, User $userData)
     {
         $dbh = $this->dbh;
 
-        $statement = $dbh->prepare("INSERT INTO users (name, mail, role, password) VALUES (:name,:mail,:role,:password)");
+        $statement = $dbh->prepare("INSERT INTO users (user_id, name, mail, role, password) VALUES (:id :name,:mail,:role,:password)");
 
+        $statement -> bindParam(":id", $id);
         $statement -> bindParam(":name", $name);
         $statement -> bindParam(":mail", $mail);
         $statement -> bindParam(":role", $role);
         $statement -> bindParam(":password", $password);
 
+        $id = $uid;
         $name = $userData->name;
         $mail = $userData->mail;
         $role = $userData->role;
         $password = $userData->password;
-
-        $statement->execute();
-
     }
 
-    public function createStudent() {
+    public function createStudent($userData)
+    {
+        $dbh = $this->dbh;
+        $statement = $dbh->prepare("INSERT INTO students (student_id, 
+        try {
+            $uid = uuid();
+            $dbh->beginTransaction();
+
+            create_user($uid, $userData);
+
+
+
+            $dbh->commit;
+        } catch (Exception $e) {
+            $dbh->rollBack();
+        }
     }
 
-    public function createLecturer() {
+    public function createLecturer($userData)
+    {
+        $dbh = $this->dbh;
+        try {
+
+            $dbh->beginTransaction();
+
+
+            $dbh->commit;
+        } catch (Exception $e) {
+            $dbh->rollBack();
+        }
     }
 
     public function updatePassword()
@@ -105,6 +131,22 @@ class Repository
 
     # Reports
 
+    # guid4v funksjon hentet fra:
+    # https://www.uuidgenerator.net/dev-corner/php
+    private function uuid()
+    {
+        // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+        $data = random_bytes(16);
+        assert(strlen($data) == 16);
+
+        // Set version to 0100
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        // Set bits 6-7 to 10
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        // Output the 36 character UUID.
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
 
 
     # TESTING
