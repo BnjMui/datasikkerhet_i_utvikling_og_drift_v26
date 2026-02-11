@@ -21,12 +21,12 @@ class Repository
     # Users
     public function getUserByMail(string $mail): User
     {
+        # TODO: Fjerne passord og lage nytt objekt for bruker uten passord
         $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE mail = ?");
         $statement->execute([$mail]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         $user = new User($result["user_id"], $result["first_name"], $result["last_name"], $result["mail"], $result["role"], $result["password"]);
-        print_r($user);
         return $user;
     }
 
@@ -76,6 +76,7 @@ class Repository
 
             $this->createUser($uid, $userData);
             $statement->execute([$uid, $userData->avatar, $userData->security_question, $userData->security_answer]);
+            $this->createCourse($uid, $userData->course);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
@@ -103,14 +104,32 @@ class Repository
     # Courses
     public function getCourses()
     {
+        $statement = $this->dbh->prepare(
+            "SELECT course_id, lecturer_id, course_code, pin_code FROM courses"
+        );
+
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        print_r($result);
+        
     }
 
     public function getCourse()
     {
+
     }
 
-    public function createCourse()
+    public function createCourse(string $lecturer_id, CreateCourseDto $courseData): void
     {
+        // TODO legg til createCourse objekt som property i CreateLecturerDto objektet
+        $statement = $this->dbh->prepare(
+            "INSERT INTO courses
+                (lecturer_id, course_code, pin_code)
+            VALUES(?, ?, ?)"
+        );
+
+        $statement->execute([$lecturer_id, $courseData->course_code, $courseData->pin_code]);
     }
 
     public function checkCoursePin()
