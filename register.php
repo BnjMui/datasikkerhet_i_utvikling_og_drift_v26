@@ -48,7 +48,7 @@ $rolle = 'guest';
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="registreringsprosess.php" enctype="multipart/form-data" novalidate>
+            <section method="POST" action="registreringsprosess.php" enctype="multipart/form-data" novalidate>
                 <fieldset class="user-type-section">
                     <h3>Velg brukertype</h3>
                     <article class="radio-group">
@@ -75,7 +75,7 @@ $rolle = 'guest';
                     <input type="text" id="lastname" name="lastname" placeholder="Ditt etternavn" required>
                 </form>
 
-                <formiv class="form-group">
+                <form class="form-group">
                     <label for="email">E-post *</label>
                     <input type="email" id="email" name="email" placeholder="din.email@example.com" required>
                 </form>
@@ -142,7 +142,7 @@ $rolle = 'guest';
                     <button type="submit">Registrer</button>
                     <a href="login.php" class="btn-login">Logg inn</a>
                 </section>
-            </form>
+            </section>
 
             <section class="login-link">
                 <p>Har du allerede en konto? <a href="login.php">Logg inn her</a></p>
