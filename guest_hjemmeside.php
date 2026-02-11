@@ -57,13 +57,13 @@ if ($rolle === 'foreleser') {
         </header>
 
         <?php if ($bruker): ?>
-            <section class="user-profile-section" style="background: #f5f5f5; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
+            <section class="user-profile-section">
                 <h2>Brukerprofil</h2>
                 <p><strong>Navn:</strong> <?php echo htmlspecialchars($bruker['navn']); ?></p>
                 <p><strong>E-post:</strong> <?php echo htmlspecialchars($bruker['email']); ?></p>
                 <p><strong>Rolle:</strong> <?php echo ucfirst(htmlspecialchars($bruker['rolle'])); ?></p>
                 <p>
-                    <a href="passordbytte.php" style="background: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block;">
+                    <a href="passordbytte.php">
                         Endre passord
                     </a>
                 </p>

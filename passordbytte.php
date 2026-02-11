@@ -121,8 +121,8 @@ $rolle = isset($currentUser['rolle']) ? $currentUser['rolle'] : 'guest';
                 <?php endif; ?>
             </form>
 
-            <section style="text-align: center; margin-top: 20px;">
-                <p><a href="guest_hjemmeside.php" style="color: #008CBA; text-decoration: none;">Tilbake til hjemmeside</a></p>
+            <section>
+                <p><a href="guest_hjemmeside.php">Tilbake til hjemmeside</a></p>
             </section>
         </article>
     </main>
