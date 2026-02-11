@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    user_id VARCHAR(36) AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(36)  PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     mail VARCHAR(100) NOT NULL UNIQUE,
@@ -8,14 +8,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS students (
-    student_id VARCHAR(36) AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(36)  PRIMARY KEY,
     study_field VARCHAR(255) NOT NULL,
     class_year YEAR NOT NULL,
     FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS lecturers (
-    lecturer_id VARCHAR(36) AUTO_INCREMENT PRIMARY KEY,
+    lecturer_id VARCHAR(36)  PRIMARY KEY,
     avatar VARCHAR(255),
     security_question VARCHAR(255) NOT NULL,
     security_answer VARCHAR(255) NOT NULL,

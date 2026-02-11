@@ -1,8 +1,11 @@
 <?php
 
-use Entities\User;
+include_once "entities/user.php";
+include_once "models/create_user_dto.php";
+include_once "models/create_student_dto.php";
+include_once "models/create_lecturer_dto.php";
+include_once "models/create_course_dto.php";
 
-include "./entities/user.php";
 include "db.php";
 class Repository
 {
@@ -16,67 +19,68 @@ class Repository
     }
 
     # Users
-    public function getUserByMail(string $mail)
+    public function getUserByMail(string $mail): User
     {
-        $dbh = $this->dbh;
-
-        $statement = $dbh->prepare("SELECT user_id, name, mail, role FROM users WHERE mail = ?");
+        $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE mail = ?");
         $statement->execute([$mail]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        $user = new User($result["user_id"], $result["name"], $result["mail"], $result["role"], "pass");
+        $user = new User($result["user_id"], $result["first_name"], $result["last_name"], $result["mail"], $result["role"], $result["password"]);
         print_r($user);
-
+        return $user;
     }
 
-    public function createUser($uid, User $userData)
+    public function createUser(string $uid, CreateUserDto $userData): void
     {
-        $dbh = $this->dbh;
+        $statement = $this->dbh->prepare(
+            "INSERT INTO users
+            (user_id, first_name, last_name, mail, role, password)
+            VALUES (?, ?, ?, ?, ?, ?)"
+        );
 
-        $statement = $dbh->prepare("INSERT INTO users (user_id, name, mail, role, password) VALUES (:id :name,:mail,:role,:password)");
-
-        $statement -> bindParam(":id", $id);
-        $statement -> bindParam(":name", $name);
-        $statement -> bindParam(":mail", $mail);
-        $statement -> bindParam(":role", $role);
-        $statement -> bindParam(":password", $password);
-
-        $id = $uid;
-        $name = $userData->name;
-        $mail = $userData->mail;
-        $role = $userData->role;
-        $password = $userData->password;
+        $statement->execute([$uid, $userData->first_name, $userData->last_name, $userData->mail, $userData->role, $userData->password]);
     }
 
-    public function createStudent($userData)
+    public function createStudent(CreateStudentDto $userData): bool
     {
-        $dbh = $this->dbh;
-        $statement = $dbh->prepare("INSERT INTO students (student_id, 
+        $statement = $this->dbh->prepare(
+            "INSERT INTO students
+                (student_id, study_field, class_year)
+            VALUES (?, ?, ?)"
+        );
+
         try {
-            $uid = uuid();
-            $dbh->beginTransaction();
+            $uid = $this->uuid();
+            $this->dbh->beginTransaction();
 
-            create_user($uid, $userData);
+            $this->createUser($uid, $userData);
+            $statement->execute([$uid, $userData->study_field, $userData->class_year]);
 
-
-
-            $dbh->commit;
+            return $this->dbh->commit();
         } catch (Exception $e) {
-            $dbh->rollBack();
+            $this->dbh->rollBack();
+            throw $e;
         }
     }
 
-    public function createLecturer($userData)
+    public function createLecturer(CreateLecturerDto $userData): bool
     {
-        $dbh = $this->dbh;
+        $statement = $this->dbh->prepare(
+            "INSERT INTO lecturers
+                (lecturer_id, avatar, security_question, security_answer)
+            VALUES (?, ?, ?, ?)"
+        );
         try {
+            $uid = $this->uuid();
+            $this->dbh->beginTransaction();
 
-            $dbh->beginTransaction();
+            $this->createUser($uid, $userData);
+            $statement->execute([$uid, $userData->avatar, $userData->security_question, $userData->security_answer]);
 
-
-            $dbh->commit;
+            return $this->dbh->commit();
         } catch (Exception $e) {
-            $dbh->rollBack();
+            $this->dbh->rollBack();
+            throw $e;
         }
     }
 
@@ -133,7 +137,7 @@ class Repository
 
     # guid4v funksjon hentet fra:
     # https://www.uuidgenerator.net/dev-corner/php
-    private function uuid()
+    private function uuid(): string
     {
         // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
         $data = random_bytes(16);
