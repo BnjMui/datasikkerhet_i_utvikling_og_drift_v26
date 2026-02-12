@@ -1,5 +1,6 @@
 <?php
 include_once "create_course_dto.php";
+include_once "create_user_dto.php";
 class CreateLecturerDto extends CreateUserDto
 {
     public string $avatar;
