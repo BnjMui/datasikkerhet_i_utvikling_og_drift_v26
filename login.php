@@ -116,6 +116,7 @@ $rolle = 'guest';
 
             <section>
                 <p>Har du ikke en konto? <a href="register.php">Registrer deg her</a></p>
+                <p>Glemt passord som foreleser? <a href="glemt_passord_foreleser.php">Tilbakestill her</a></p>
                 </section>
         </article>
     </main>

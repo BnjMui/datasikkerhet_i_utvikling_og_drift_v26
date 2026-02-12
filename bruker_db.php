@@ -67,11 +67,21 @@ function finnBruker($brukernavn, $passord)
 function finnBrukerMedEmail($email)
 {
     global $brukere;
+    // Sjekk først i minne-array
     foreach ($brukere as $bruker) {
-        if ($bruker['email'] === $email) {
+        if (isset($bruker['email']) && $bruker['email'] === $email) {
             return $bruker;
         }
     }
+
+    // Deretter sjekk i JSON-lagring (persistente registreringer)
+    $registrerte = lastBrukereJson();
+    foreach ($registrerte as $bruker) {
+        if (isset($bruker['email']) && $bruker['email'] === $email) {
+            return $bruker;
+        }
+    }
+
     return null;
 }
 
@@ -79,7 +89,7 @@ function finnBrukerMedEmail($email)
  * Registrer ny bruker (student eller lecturer)
  * Lagrer data i en JSON-fil siden det ikke er en riktig database
  */
-function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture = null, $studieretning = null, $studiekull = null, $emne = null)
+function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture = null, $studieretning = null, $studiekull = null, $emne = null, $securityQuestion = null, $securityAnswerHash = null)
 {
     global $brukere;
 
@@ -117,6 +127,8 @@ function registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassw
     // Legg til forelesersspesifikke felt hvis bruker er foreleser
     if ($user_type === 'lecturer') {
         $ny_bruker['emne'] = $emne;
+        $ny_bruker['sikkerhet_sporsmal'] = $securityQuestion;
+        $ny_bruker['sikkerhet_svar'] = $securityAnswerHash;
     }
 
     // Legg til i brukere array

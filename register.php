@@ -136,6 +136,16 @@ $rolle = 'guest';
                             <p class="file-input-info">Tillatte formater: JPG, PNG, GIF (maks 5MB)</p>
                         </form>
                     </article>
+
+                    <article class="form-group">
+                        <label for="security_question">Sikkerhetsspørsmål *</label>
+                        <input type="text" id="security_question" name="security_question" placeholder="Skriv ditt sikkerhetsspørsmål" required>
+                    </article>
+
+                    <article class="form-group">
+                        <label for="security_answer">Svar på sikkerhetsspørsmål *</label>
+                        <input type="text" id="security_answer" name="security_answer" placeholder="Svar" required>
+                    </article>
                 </section>
 
                 <section class="button-group">
@@ -162,6 +172,8 @@ $rolle = 'guest';
             const selectedType = document.querySelector('input[name="user_type"]:checked').value;
             const passwordField = document.getElementById('password');
             const passwordConfirmField = document.getElementById('password_confirm');
+            const securityQuestionField = document.getElementById('security_question');
+            const securityAnswerField = document.getElementById('security_answer');
             
             if (selectedType === 'student') {
                 if (studentSection) {
@@ -175,6 +187,8 @@ $rolle = 'guest';
                 // Password required for students
                 passwordField.required = true;
                 passwordConfirmField.required = true;
+                if (securityQuestionField) securityQuestionField.required = false;
+                if (securityAnswerField) securityAnswerField.required = false;
             } else if (selectedType === 'lecturer') {
                 if (studentSection) {
                     studentSection.classList.remove('active');
@@ -187,6 +201,8 @@ $rolle = 'guest';
                 // Password not required for lecturers
                 passwordField.required = false;
                 passwordConfirmField.required = false;
+                if (securityQuestionField) securityQuestionField.required = true;
+                if (securityAnswerField) securityAnswerField.required = true;
             }
         }
 

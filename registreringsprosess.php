@@ -12,6 +12,8 @@ $password_confirm = $_POST['password_confirm'] ?? '';
 $studieretning = trim($_POST['studieretning'] ?? '');
 $studiekull = trim($_POST['studiekull'] ?? '');
 $emne = trim($_POST['emne'] ?? '');
+$security_question = trim($_POST['security_question'] ?? '');
+$security_answer = trim($_POST['security_answer'] ?? '');
 
 // Validering
 $valideringsfeil = [];
@@ -68,6 +70,14 @@ if ($user_type === 'lecturer') {
     if (empty($emne)) {
         $valideringsfeil[] = 'Du må velge et emne du underviser i.';
     }
+
+    if (empty($security_question) || strlen($security_question) < 5) {
+        $valideringsfeil[] = 'Sikkerhetsspørsmål må være minst 5 tegn.';
+    }
+
+    if (empty($security_answer) || strlen($security_answer) < 2) {
+        $valideringsfeil[] = 'Sikkerhetssvar må være minst 2 tegn.';
+    }
 }
 
 // Hvis validering feilet, gå tilbake til register.php med feilmeldinger
@@ -118,7 +128,12 @@ if ($user_type === 'lecturer' && isset($_FILES['picture']) && $_FILES['picture']
 }
 
 // Legg til bruker i bruker_db.php array
-$newUserId = registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture, $studieretning, $studiekull, $emne);
+$securityAnswerHash = null;
+if ($user_type === 'lecturer' && !empty($security_answer)) {
+    $securityAnswerHash = password_hash($security_answer, PASSWORD_DEFAULT);
+}
+
+$newUserId = registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture, $studieretning, $studiekull, $emne, $security_question, $securityAnswerHash);
 
 if ($newUserId) {
     // Omdirigerer til login med suksessmelding
