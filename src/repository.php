@@ -1,19 +1,19 @@
 <?php
 
-include_once "db.php";
+require_once "db.php";
 
-include_once "entities/user.php";
+require_once "entities/user.php";
 
-include_once "models/create_user_dto.php";
-include_once "models/create_student_dto.php";
-include_once "models/create_lecturer_dto.php";
-include_once "models/create_course_dto.php";
-include_once "models/user_login_dto.php";
-include_once "models/create_message_dto.php";
-include_once "models/message_dto.php";
-include_once "models/course_dto.php";
-include_once "models/create_comment_dto.php";
-include_once "models/base_message_reply.php";
+require_once "models/create_user_dto.php";
+require_once "models/create_student_dto.php";
+require_once "models/create_lecturer_dto.php";
+require_once "models/create_course_dto.php";
+require_once "models/user_login_dto.php";
+require_once "models/create_message_dto.php";
+require_once "models/message_dto.php";
+require_once "models/course_dto.php";
+require_once "models/create_comment_dto.php";
+require_once "models/base_message_reply.php";
 
 class Repository
 {
@@ -37,6 +37,7 @@ class Repository
         $user = new User($result["user_id"], $result["first_name"], $result["last_name"], $result["mail"], $result["role"], $result["password"]);
         return $user;
     }
+
 
     public function getUserLoginInfo(string $mail): UserLoginDto
     {
@@ -106,21 +107,64 @@ class Repository
         }
     }
 
-    public function updatePassword(string $user_id, string $new_password): void
+    public function updatePasswordByUserId(string $user_id, string $new_password): bool
     {
-        $statement = $this->dbh->prepare("");
+        $statement = $this->dbh->prepare("
+            UPDATE users
+            SET password = ?
+            WHERE user_id = ?
+            ");
+        try {
+            $statement->execute([$new_password, $user_id]);
+            return $this->dbh->commit();
+
+        } catch (Exception $e) {
+            $this->dbh->rollBack();
+            throw $e;
+            return false;
+        }
     }
 
     public function getSecurityQuestions(string $user_id): void
     {
     }
 
-    public function getStudentById(string $user_id): void
+    public function getStudentDataById(string $user_id): StudentDataDto
     {
+        $statement = $this->dbh->prepare("
+            SELECT study_field, class_year FROM students
+            WHERE student_id = ?
+            ");
+
+        $statement->execute([$user_id]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $student_data = new StudentDataDto();
+
+        $student_data->study_field = $result["study_field"];
+        $student_data->class_year = $result["class_year"];
+
+        return $student_data;
     }
 
-    public function getLecturerById(string $user_id): void
+    public function getLecturerById(string $user_id): LecturerDataDto
     {
+        $statement = $this->dbh->prepare("
+            SELECT avatar, security_question, security_answer FROM lecturers
+            WHERE lecturer_id = ?
+            ");
+
+        $statement->execute([$user_id]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $lecturer_data = new LecturerDataDto();
+
+        $lecturer_data->study_field = $result["study_field"];
+        $lecturer_data->class_year = $result["class_year"];
+
+        return $lecturer_data;
     }
 
 
@@ -135,15 +179,9 @@ class Repository
         );
 
         $statement->execute();
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, "CourseDto");
 
-        $courses = [];
-
-        foreach ($result as $key => $row) {
-            $courses[$key] = new CourseDto($row["course_id"], $row["lecturer_id"], $row["course_code"], $row["pin_code"]);
-        }
-
-        return $courses;
+        return $result;
     }
 
     /*
@@ -212,10 +250,6 @@ class Repository
         }
     }
 
-    public function checkCoursePin(): void
-    {
-    }
-
     # Messages
     /*
     * @return list<MessageDto>
@@ -225,18 +259,51 @@ class Repository
         $statement = $this->dbh->prepare("SELECT message_id, course_id, created_at, text FROM messages WHERE course_id = ?");
 
         $statement->execute([$course_id]);
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, "MessageDto");
 
-        $messages = [];
-
-        foreach ($result as $key => $row) {
-            $messages[$key] = new MessageDto($row["message_id"], null, $row["course_id"], $row["created_at"], $row["text"]);
-        }
-
-        return $messages;
+        return $result;
     }
 
     public function createMessage(CreateMessageDto $message): bool
+    {
+        $statement = $this->dbh->prepare(
+            "INSERT INTO messages
+                (student_id, course_id, created_at, text)
+            VALUES (?, ?, ?, ?)"
+        );
+
+        try {
+            $this->dbh->beginTransaction();
+            $statement->execute([
+                $message->student_id,
+                $message->course_id,
+                $message->created_at,
+                $message->text
+            ]);
+
+            return $this->dbh->commit();
+        } catch (Exception $e) {
+            $this->dbh->rollBack();
+            throw $e;
+            return false;
+        }
+    }
+
+    # Responses
+    /*
+    * @return list<ReplyDto>
+    */
+    public function getReplies(int $message_id): array
+    {
+        $statement = $this->dbh->prepare("SELECT reply_id, message_id, created_at, text FROM replies WHERE message_id = ?");
+
+        $statement->execute([$message_id]);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, "ReplyDto");
+
+        return $result;
+    }
+
+    public function createReply(BaseMessageReplyType $reply): bool
     {
         $statement = $this->dbh->prepare(
             "INSERT INTO messages
@@ -256,30 +323,58 @@ class Repository
         }
     }
 
-    # Responses
-    /*
-    * @return list<ReplyDto>
-    */
-    public function getReplies(int $message_id): array
-    {
-    }
-    public function createResponse(BaseMessageReplyType $reply): void
-    {
-    }
-
     # Comments
     /*
     * @return list<CommentDto>
     */
     public function getComments(string $message_id): array
     {
+        $statement = $this->dbh->prepare("SELECT comment_id, message_id, created_at, text FROM comments WHERE message_id = ?");
+
+        $statement->execute([$message_id]);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, "MessageDto");
+
+        return $result;
     }
-    public function CreateComment(BaseMessageReplyType $comment): void
+
+    public function CreateComment(BaseMessageReplyType $comment): bool
     {
+        $statement = $this->dbh->prepare(
+            "INSERT INTO messages
+                (student_id, course_id, created_at, text)
+            VALUES (?, ?, ?, ?)"
+        );
+
+        try {
+            $this->dbh->beginTransaction();
+            $statement->execute([$message->student_id, $message->course_id, $message->created_at, $message->text]);
+
+            return $this->dbh->commit();
+        } catch (Exception $e) {
+            $this->dbh->rollBack();
+            throw $e;
+            return false;
+        }
     }
     # Reports
-    public function CreateReport(BaseMessageReplyType $report): void
+    public function CreateReport(BaseMessageReplyType $report): bool
     {
+        $statement = $this->dbh->prepare(
+            "INSERT INTO messages
+                (student_id, course_id, created_at, text)
+            VALUES (?, ?, ?, ?)"
+        );
+
+        try {
+            $this->dbh->beginTransaction();
+            $statement->execute([$message->student_id, $message->course_id, $message->created_at, $message->text]);
+
+            return $this->dbh->commit();
+        } catch (Exception $e) {
+            $this->dbh->rollBack();
+            throw $e;
+            return false;
+        }
     }
 
     # uuid funksjon hentet fra:

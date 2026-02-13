@@ -21,7 +21,7 @@ $repo = new Repository();
 # #  
 #  print_r($lecturer);
 #  $repo->createLecturer($lecturer);
-print_r( $repo->getMessages(2));
+print_r( $repo->getCourses());
 #
 # $user_login = new UserLoginDto();
 # 
