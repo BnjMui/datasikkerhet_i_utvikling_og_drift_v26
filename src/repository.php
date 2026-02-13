@@ -125,10 +125,6 @@ class Repository
         }
     }
 
-    public function getSecurityQuestions(string $user_id): void
-    {
-    }
-
     public function getStudentDataById(string $user_id): StudentDataDto
     {
         $statement = $this->dbh->prepare("
@@ -306,14 +302,14 @@ class Repository
     public function createReply(BaseMessageReplyType $reply): bool
     {
         $statement = $this->dbh->prepare(
-            "INSERT INTO messages
-                (student_id, course_id, created_at, text)
-            VALUES (?, ?, ?, ?)"
+            "INSERT INTO replies
+                (message_id, created_at, text)
+            VALUES (?, ?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$message->student_id, $message->course_id, $message->created_at, $message->text]);
+            $statement->execute([$reply->message_id, $reply->created_at, $reply->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
@@ -340,14 +336,14 @@ class Repository
     public function CreateComment(BaseMessageReplyType $comment): bool
     {
         $statement = $this->dbh->prepare(
-            "INSERT INTO messages
-                (student_id, course_id, created_at, text)
-            VALUES (?, ?, ?, ?)"
+            "INSERT INTO comments
+                (message_id, created_at, text)
+            VALUES (?, ?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$message->student_id, $message->course_id, $message->created_at, $message->text]);
+            $statement->execute([$comment->message_id, $comment->created_at, $comment->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
@@ -356,18 +352,20 @@ class Repository
             return false;
         }
     }
+
     # Reports
     public function CreateReport(BaseMessageReplyType $report): bool
     {
+
         $statement = $this->dbh->prepare(
-            "INSERT INTO messages
-                (student_id, course_id, created_at, text)
-            VALUES (?, ?, ?, ?)"
+            "INSERT INTO reports
+                (message_id, created_at, text)
+            VALUES (?, ?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$message->student_id, $message->course_id, $message->created_at, $message->text]);
+            $statement->execute([$report->message_id, $report->created_at, $report->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
