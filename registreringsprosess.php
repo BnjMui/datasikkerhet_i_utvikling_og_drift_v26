@@ -2,6 +2,7 @@
 session_start();
 
 require_once 'bruker_db.php';
+require_once 'api_client.php';
 
 $user_type = $_POST['user_type'] ?? '';
 $firstname = trim($_POST['firstname'] ?? '');
@@ -136,6 +137,28 @@ if ($user_type === 'lecturer' && !empty($security_answer)) {
 $newUserId = registrerBruker($user_type, $firstname, $lastname, $email, $hashedPassword, $picture, $studieretning, $studiekull, $emne, $security_question, $securityAnswerHash);
 
 if ($newUserId) {
+    // Optional: Send registration data to API
+    $apiEnabled = false; // Set to true and update URL to enable API calls
+    $apiUrl = 'https://api.example.com/register'; // Replace with your API endpoint
+    
+    if ($apiEnabled) {
+        $apiPayload = [
+            'user_type' => $user_type,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'email' => $email,
+            'studieretning' => $studieretning,
+            'studiekull' => $studiekull,
+            'emne' => $emne
+        ];
+        
+        $apiResponse = api_post($apiUrl, $apiPayload);
+        
+        if (!$apiResponse['ok']) {
+            error_log('API registration failed: ' . $apiResponse['error'] ?? $apiResponse['body']);
+        }
+    }
+    
     // Omdirigerer til login med suksessmelding
     header('Location: login.php?success=1');
     exit;
