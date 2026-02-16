@@ -7,6 +7,7 @@ class UserDto
     public string $last_name;
     public string $mail;
     public string $role;
+    public string $password;
 }
 
 class ExtendedUserDto extends UserDto

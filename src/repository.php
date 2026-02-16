@@ -14,6 +14,7 @@ require_once "models/message_dto.php";
 require_once "models/course_dto.php";
 require_once "models/create_comment_dto.php";
 require_once "models/base_message_reply.php";
+require_once "models/user_dto.php";
 
 class Repository
 {
@@ -27,15 +28,14 @@ class Repository
     }
 
     # Users
-    public function getUserByMail(string $mail): User
+    public function getUserByMail(string $mail): UserDto
     {
         # TODO: Fjerne passord og lage nytt objekt for bruker uten passord
         $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE mail = ?");
         $statement->execute([$mail]);
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetchObject("UserDto");
 
-        $user = new User($result["user_id"], $result["first_name"], $result["last_name"], $result["mail"], $result["role"], $result["password"]);
-        return $user;
+        return $result;
     }
 
 
@@ -44,10 +44,9 @@ class Repository
         $statement = $this->dbh->prepare("SELECT user_id, mail, password FROM users WHERE mail = ?");
 
         $statement->execute([$mail]);
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        $user_info = new UserLoginDto($result["user_id"], $result["mail"], $result["password"]);
+        $result = $statement->fetchObject("UserLoginDto");
 
-        return $user_info;
+        return $result;
     }
 
     public function createUser(string $uid, CreateUserDto $userData): void
@@ -115,9 +114,11 @@ class Repository
             WHERE user_id = ?
             ");
         try {
-            $statement->execute([$new_password, $user_id]);
-            return $this->dbh->commit();
+            $this->dbh->beginTransaction();
 
+            $statement->execute([$new_password, $user_id]);
+
+            return $this->dbh->commit();
         } catch (Exception $e) {
             $this->dbh->rollBack();
             throw $e;
@@ -134,17 +135,12 @@ class Repository
 
         $statement->execute([$user_id]);
 
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetchObject("StudentDataDto");
 
-        $student_data = new StudentDataDto();
-
-        $student_data->study_field = $result["study_field"];
-        $student_data->class_year = $result["class_year"];
-
-        return $student_data;
+        return $result;
     }
 
-    public function getLecturerById(string $user_id): LecturerDataDto
+    public function getLecturerDataById(string $user_id): LecturerDataDto
     {
         $statement = $this->dbh->prepare("
             SELECT avatar, security_question, security_answer FROM lecturers
@@ -153,14 +149,9 @@ class Repository
 
         $statement->execute([$user_id]);
 
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetchObject("LecturerDataDto");
 
-        $lecturer_data = new LecturerDataDto();
-
-        $lecturer_data->study_field = $result["study_field"];
-        $lecturer_data->class_year = $result["class_year"];
-
-        return $lecturer_data;
+        return $result;
     }
 
 
@@ -188,24 +179,20 @@ class Repository
         $statement = $this->dbh->prepare("SELECT c.course_id, lecturer_id, course_code, pin_code FROM courses c, students_courses s WHERE c.course_id = s.course_id AND s.student_id = ?");
 
         $statement->execute([$user_id]);
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, "CourseDto");
 
-        $courses = [];
-
-        foreach ($result as $key => $row) {
-            $courses[$key] = new CourseDto($row["course_id"], $row["lecturer_id"], $row["course_code"], $row["pin_code"]);
-        }
-
-        return $courses;
+        return $result;
     }
 
-    public function getCourseById(string $course_id): void
+    public function getCourseById(int $course_id): CourseDto
     {
-        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, pin_code WHERE course_id = ?");
+        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, pin_code FROM courses WHERE course_id = ?");
 
-        $statement->execute($course_id);
+        $statement->execute([$course_id]);
 
+        $result = $statement->fetchObject("CourseDto");
 
+        return $result;
     }
 
     public function createCourse(string $lecturer_id, CreateCourseDto $courseData): bool
