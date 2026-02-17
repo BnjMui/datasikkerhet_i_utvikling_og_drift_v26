@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Enkel HTTP API client som bruker cURL
  * støtter GET, POST, PUT, DELETE med JSON filer
@@ -14,11 +15,13 @@
  * @param int $timeout Forespørsels timeout i sekunder
  * @return array Responsmatrise med nøkler: ok, status, body, json, error
  */
-function api_request(string $method, string $url, ?array $data = null, array $headers = [], int $timeout = 10): array {
+function api_request(string $method, string $url, ?array $data = null, array $headers = [], int $timeout = 10)
+{
     if (!function_exists('curl_init')) {
         return ['ok' => false, 'error' => 'cURL not available'];
     }
 
+    $baseUrl = "http://localhost:8001/api";
     $ch = curl_init();
     $method = strtoupper($method);
 
@@ -35,9 +38,8 @@ function api_request(string $method, string $url, ?array $data = null, array $he
         $allHeaders[] = 'Content-Type: application/json';
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     }
-
     // Konfigurer cURL-alternativer
-    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_URL, $baseUrl . $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $allHeaders);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
@@ -48,7 +50,6 @@ function api_request(string $method, string $url, ?array $data = null, array $he
 
     // Utfør forespørsel
     $responseBody = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
 
     // Håndter cURL-feil
@@ -64,13 +65,7 @@ function api_request(string $method, string $url, ?array $data = null, array $he
     $decoded = json_decode($responseBody, true);
 
     // Returner responsomslag
-    return [
-        'ok' => $httpCode >= 200 && $httpCode < 300,
-        'status' => $httpCode,
-        'body' => $responseBody,
-        'json' => $decoded,
-        'error' => null
-    ];
+    return $decoded;
 }
 
 /**
@@ -82,7 +77,8 @@ function api_request(string $method, string $url, ?array $data = null, array $he
  * @param int $timeout Timeout i sekunder
  * @return array Responsmatrise
  */
-function api_get(string $url, ?array $params = null, array $headers = [], int $timeout = 10): array {
+function api_get(string $url, ?array $params = null, array $headers = [], int $timeout = 10)
+{
     return api_request('GET', $url, $params, $headers, $timeout);
 }
 
@@ -95,7 +91,8 @@ function api_get(string $url, ?array $params = null, array $headers = [], int $t
  * @param int $timeout Timeout i sekunder
  * @return array Responsmatrise
  */
-function api_post(string $url, ?array $data = null, array $headers = [], int $timeout = 10): array {
+function api_post(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
+{
     return api_request('POST', $url, $data, $headers, $timeout);
 }
 
@@ -108,7 +105,8 @@ function api_post(string $url, ?array $data = null, array $headers = [], int $ti
  * @param int $timeout Timeout i sekunder
  * @return array Responsmatrise
  */
-function api_put(string $url, ?array $data = null, array $headers = [], int $timeout = 10): array {
+function api_put(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
+{
     return api_request('PUT', $url, $data, $headers, $timeout);
 }
 
@@ -121,7 +119,7 @@ function api_put(string $url, ?array $data = null, array $headers = [], int $tim
  * @param int $timeout Timeout i sekunder
  * @return array Responsmatrise
  */
-function api_delete(string $url, ?array $data = null, array $headers = [], int $timeout = 10): array {
+function api_delete(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
+{
     return api_request('DELETE', $url, $data, $headers, $timeout);
 }
-?>

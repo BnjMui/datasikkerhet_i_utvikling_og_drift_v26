@@ -4,6 +4,7 @@ session_start();
 // Inkluder emnedata og brukerdata
 require_once '../emne_db.php';
 require_once '../bruker_db.php';
+require_once '../api_client.php';
 
 // Hent brukerinfo fra session
 $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
@@ -73,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
         <?php elseif ($emne): ?>
             <article class="emne-container">
                 <header class="emne-header">
-                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></p>
+                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['course_code'])); ?></p>
                     <h1><?php echo htmlspecialchars($emne['navn']); ?></h1>
                 </header>
 

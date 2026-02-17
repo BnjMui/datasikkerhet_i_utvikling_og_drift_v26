@@ -4,6 +4,7 @@ session_start();
 // Inkluder emnedata og brukerdata
 require_once '../emne_db.php';
 require_once '../bruker_db.php';
+require_once '../api_client.php';
 
 // Hent brukerinfo fra session
 $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
@@ -85,16 +86,16 @@ if ($rolle === 'foreleser') {
                             <li>
                                 <article class="emne-kort">
                                     <?php if ($rolle === 'guest'): ?>
-                                        <a href="emne.php?kode=<?php echo urlencode($emne['kode']); ?>"
-                                            aria-label="<?php echo htmlspecialchars($emne['kode'] . ' - ' . $emne['navn']); ?>">
+                                        <a href="emne.php?kode=<?php echo urlencode($emne['course_code']); ?>"
+                                            aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_code']); ?>">
                                         <?php else: ?>
-                                            <a href="guest_meldinger.php?kode=<?php echo urlencode($emne['kode']); ?>"
-                                                aria-label="<?php echo htmlspecialchars($emne['kode'] . ' - ' . $emne['navn']); ?>">
+                                            <a href="guest_meldinger.php?kode=<?php echo urlencode($emne['course_code']); ?>"
+                                                aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_code']); ?>">
                                             <?php endif; ?>
                                             <header>
-                                                <h3 class="emne-kode"><?php echo htmlspecialchars($emne['kode']); ?></h3>
+                                                <h3 class="emne-kode"><?php echo htmlspecialchars($emne['course_code']); ?></h3>
                                             </header>
-                                            <p class="emne-navn"><?php echo htmlspecialchars($emne['navn']); ?></p>
+                                            <p class="emne-navn"><?php echo htmlspecialchars($emne['course_code']); ?></p>
                                             </a>
                                 </article>
                             </li>
