@@ -10,15 +10,6 @@ $data   = get_request_data();
 if ($method === 'POST') {
     validate_required($data, ['email', 'password']);
 
-    $stmt = $db->prepare("
-        SELECT u.user_id, u.first_name, u.last_name, u.mail, u.password,
-               s.study_field, s.class_year
-        FROM users u
-        JOIN students s ON u.user_id = s.student_id
-        WHERE u.mail = ? AND u.role = 'student'
-    ");
-    $stmt->execute([$data['email']]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Vag feilmelding — avslør ikke om e-post finnes
     if (!$student || !password_verify($data['password'], $student['password'])) {

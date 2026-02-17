@@ -9,15 +9,6 @@ $method    = get_method();
 $studentId = require_auth();
 
 if ($method === 'GET') {
-    $stmt = $db->prepare("
-        SELECT u.user_id, u.first_name, u.last_name, u.mail,
-               s.study_field, s.class_year
-        FROM users u
-        JOIN students s ON u.user_id = s.student_id
-        WHERE u.user_id = ?
-    ");
-    $stmt->execute([$studentId]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$student) send_error('Student ikke funnet', 404);
 

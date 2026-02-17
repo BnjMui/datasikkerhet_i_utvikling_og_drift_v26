@@ -38,6 +38,14 @@ class Repository
         return $result;
     }
 
+    public function sqlInit():void
+    {
+        $initsql = file_get_contents("init.sql");
+
+        $this->dbh->exec($initsql);
+
+    }
+
 
     public function getUserLoginInfo(string $mail): UserLoginDto
     {
@@ -162,7 +170,7 @@ class Repository
     public function getCourses(): array
     {
         $statement = $this->dbh->prepare(
-            "SELECT course_id, lecturer_id, course_code, pin_code FROM courses"
+            "SELECT course_id, lecturer_id, course_code FROM courses"
         );
 
         $statement->execute();
