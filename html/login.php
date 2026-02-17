@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'bruker_db.php';
+require_once '../bruker_db.php';
 
 // Hvis allerede innlogget, redirect til hjemmeside
 if (isset($_SESSION['user']) && isset($_SESSION['user']['rolle'])) {
@@ -60,12 +60,11 @@ $rolle = 'guest';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logg inn - Emneportal</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
-
+    <?php include __DIR__ . '/../header.php'; ?>
     <main>
         <article class="login-container">
             <header>
@@ -117,11 +116,11 @@ $rolle = 'guest';
             <section>
                 <p>Har du ikke en konto? <a href="register.php">Registrer deg her</a></p>
                 <p>Glemt passord som foreleser? <a href="glemt_passord_foreleser.php">Tilbakestill her</a></p>
-                </section>
+            </section>
         </article>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 </body>
 
 </html>

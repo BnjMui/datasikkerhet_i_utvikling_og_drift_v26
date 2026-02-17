@@ -2,8 +2,8 @@
 session_start();
 
 // Inkluder emnedata og brukerdata
-require_once 'emne_db.php';
-require_once 'bruker_db.php';
+require_once '../emne_db.php';
+require_once '../bruker_db.php';
 
 // Hent brukerinfo fra session
 $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
@@ -63,11 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rapporter_id']) && $r
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $emne ? htmlspecialchars(strtoupper($emne['kode'])) : 'Emne ikke funnet'; ?> - Meldinger</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
 
     <main>
         <?php if (!$harTilgang): ?>
@@ -258,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rapporter_id']) && $r
         <?php endif; ?>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 
     <!-- Rapport Modal (kun for guest) -->
     <?php if ($rolle === 'guest' && $emne): ?>

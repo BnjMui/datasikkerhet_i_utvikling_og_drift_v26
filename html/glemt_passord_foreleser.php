@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'bruker_db.php';
+require_once '../bruker_db.php';
 
 $feilmelding = '';
 $suksessmelding = '';
@@ -58,14 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 ?>
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Glemt passord - Foreleser</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
+
 <body>
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
     <main>
         <article class="login-container">
             <header>
@@ -96,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                         <p class="form-group">
                             <label>Sikkerhetsspørsmål</label>
-                            <p><strong><?php echo htmlspecialchars($user['sikkerhet_sporsmal']); ?></strong></p>
+                        <p><strong><?php echo htmlspecialchars($user['sikkerhet_sporsmal']); ?></strong></p>
                         </p>
 
                         <p class="form-group">
@@ -127,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <p><a href="login.php">Tilbake til innlogging</a></p>
         </article>
     </main>
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 </body>
+
 </html>

@@ -12,7 +12,7 @@ $brukerNavn = ($bruker && isset($bruker['navn'])) ? $bruker['navn'] : '';
 ?>
 <header role="banner">
     <nav aria-label="Hovednavigasjon">
-        <a href="guest_hjemmeside.php" class="logo">
+        <a href="./guest_hjemmeside.php" class="logo">
             <span aria-hidden="true"></span> Studentportal
         </a>
     </nav>
@@ -33,7 +33,7 @@ $brukerNavn = ($bruker && isset($bruker['navn'])) ? $bruker['navn'] : '';
                     <strong class="bruker-navn"><?php echo htmlspecialchars($brukerNavn); ?></strong>
                 <?php endif; ?>
             </p>
-            <a href="logout.php" class="btn-logout">Logg ut</a>
+            <a href="../logout.php" class="btn-logout">Logg ut</a>
         <?php else: ?>
             <p class="guest-info">
                 <span aria-hidden="true"></span> Gjest

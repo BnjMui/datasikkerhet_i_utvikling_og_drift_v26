@@ -2,8 +2,8 @@
 session_start();
 
 // Inkluder emnedata og brukerdata
-require_once 'emne_db.php';
-require_once 'bruker_db.php';
+require_once '../emne_db.php';
+require_once '../bruker_db.php';
 
 // Hent brukerinfo fra session
 $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
@@ -28,11 +28,11 @@ if ($rolle === 'foreleser') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emneoversikt - Emneportal</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
-    <?php include __DIR__ . '/header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
 
     <main>
         <header class="page-header">
@@ -105,7 +105,7 @@ if ($rolle === 'foreleser') {
         </section>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 </body>
 
 </html>

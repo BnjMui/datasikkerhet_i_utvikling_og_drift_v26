@@ -26,11 +26,11 @@ $rolle = 'guest';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrering - Emneportal</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
 
     <main role="main">
         <section class="register-container">
@@ -114,11 +114,11 @@ $rolle = 'guest';
                         <select id="emne" name="emne" required>
                             <option value="">-- Velg emne --</option>
                             <?php
-                            require_once 'emne_db.php';
+                            require_once '../emne_db.php';
                             foreach (hentAlleEmner() as $emne) {
-                                echo '<option value="' . htmlspecialchars($emne['kode']) . '">' . 
-                                     htmlspecialchars($emne['navn'] . ' (' . $emne['kode'] . ')') . 
-                                     '</option>';
+                                echo '<option value="' . htmlspecialchars($emne['kode']) . '">' .
+                                    htmlspecialchars($emne['navn'] . ' (' . $emne['kode'] . ')') .
+                                    '</option>';
                             }
                             ?>
                         </select>
@@ -156,11 +156,11 @@ $rolle = 'guest';
 
             <section class="login-link">
                 <p>Har du allerede en konto? <a href="login.php">Logg inn her</a></p>
-            </article>
-        </section>
+                </article>
+            </section>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 
     <script>
         // Velger student/Foreleser section basert på valgt brukertype
@@ -174,7 +174,7 @@ $rolle = 'guest';
             const passwordConfirmField = document.getElementById('password_confirm');
             const securityQuestionField = document.getElementById('security_question');
             const securityAnswerField = document.getElementById('security_answer');
-            
+
             if (selectedType === 'student') {
                 if (studentSection) {
                     studentSection.classList.add('active');
@@ -216,16 +216,16 @@ $rolle = 'guest';
         // Håndter emne-valg for forelesere
         const emneSelect = document.getElementById('emne');
         const emnePinField = document.getElementById('emne_pin');
-        
+
         // Emne data fra backend
-        const emneData = <?php 
-            require_once 'emne_db.php';
-            $emneDataJson = [];
-            foreach (hentAlleEmner() as $emne) {
-                $emneDataJson[$emne['kode']] = $emne['pin'];
-            }
-            echo json_encode($emneDataJson);
-        ?>;
+        const emneData = <?php
+                            require_once 'emne_db.php';
+                            $emneDataJson = [];
+                            foreach (hentAlleEmner() as $emne) {
+                                $emneDataJson[$emne['kode']] = $emne['pin'];
+                            }
+                            echo json_encode($emneDataJson);
+                            ?>;
 
         if (emneSelect) {
             emneSelect.addEventListener('change', function() {

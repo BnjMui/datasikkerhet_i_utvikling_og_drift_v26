@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'bruker_db.php';
+require_once '../bruker_db.php';
 
 // Hvis ikke innlogget, redirect til login
 if (!isset($_SESSION['user'])) {
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Verifiser gammelt passord
         $bruker = finnBrukerMedId($currentUser['id']);
-        
+
         if ($bruker && password_verify($gammelPassord, $bruker['passord'])) {
             // Oppdater passord
             if (oppdaterPassord($currentUser['id'], $nyttPassord)) {
@@ -57,12 +57,11 @@ $rolle = isset($currentUser['rolle']) ? $currentUser['rolle'] : 'guest';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Endre passord - Emneportal</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
-
+    <?php include __DIR__ . '/../header.php'; ?>
     <main>
         <article class="login-container">
             <header>
@@ -127,7 +126,7 @@ $rolle = isset($currentUser['rolle']) ? $currentUser['rolle'] : 'guest';
         </article>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../footer.php'; ?>
 </body>
 
 </html>
