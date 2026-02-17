@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
         <?php elseif ($emne): ?>
             <article class="emne-container">
                 <header class="emne-header">
-                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['course_code'])); ?></p>
+                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></p>
                     <h1><?php echo htmlspecialchars($emne['navn']); ?></h1>
                 </header>
 

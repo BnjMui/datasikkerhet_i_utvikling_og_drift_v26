@@ -21,7 +21,7 @@ function finnEmne($kode)
  */
 function hentAlleEmner()
 {
-    return api_get("/courses.php")['data'];
+    return api_request("GET", "/courses.php")['data'];
 }
 
 /**

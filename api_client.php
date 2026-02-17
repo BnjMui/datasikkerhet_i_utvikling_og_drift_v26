@@ -29,15 +29,13 @@ function api_request(string $method, string $url, ?array $data = null, array $he
     $defaultHeaders = ['Accept: application/json'];
     $allHeaders = array_merge($defaultHeaders, $headers);
 
-    // Håndter GET-parametere
-    if ($method === 'GET' && $data) {
-        $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query($data);
-    } elseif ($data !== null) {
+    if ($data !== null) {
         // For andre metoder, send data som JSON-body
         $payload = json_encode($data);
         $allHeaders[] = 'Content-Type: application/json';
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     }
+
     // Konfigurer cURL-alternativer
     curl_setopt($ch, CURLOPT_URL, $baseUrl . $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -45,8 +43,6 @@ function api_request(string $method, string $url, ?array $data = null, array $he
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
     // Utfør forespørsel
     $responseBody = curl_exec($ch);
@@ -66,60 +62,4 @@ function api_request(string $method, string $url, ?array $data = null, array $he
 
     // Returner responsomslag
     return $decoded;
-}
-
-/**
- * Lag en GET-forespørsel
- * 
- * @param string $url API-endepunkt URL
- * @param array|null $params Søkeparametere
- * @param array $headers Tilleggshoder
- * @param int $timeout Timeout i sekunder
- * @return array Responsmatrise
- */
-function api_get(string $url, ?array $params = null, array $headers = [], int $timeout = 10)
-{
-    return api_request('GET', $url, $params, $headers, $timeout);
-}
-
-/**
- * Lag en POST-forespørsel
- * 
- * @param string $url API-endepunkt URL
- * @param array|null $data Forespørselslast
- * @param array $headers Tilleggshoder
- * @param int $timeout Timeout i sekunder
- * @return array Responsmatrise
- */
-function api_post(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
-{
-    return api_request('POST', $url, $data, $headers, $timeout);
-}
-
-/**
- * Lag en PUT-forespørsel
- * 
- * @param string $url API-endepunkt URL
- * @param array|null $data Forespørselslast
- * @param array $headers Tilleggshoder
- * @param int $timeout Timeout i sekunder
- * @return array Responsmatrise
- */
-function api_put(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
-{
-    return api_request('PUT', $url, $data, $headers, $timeout);
-}
-
-/**
- * Lag en DELETE-forespørsel
- * 
- * @param string $url API-endepunkt URL
- * @param array|null $data Forespørselslast (valgfritt)
- * @param array $headers Tilleggshoder
- * @param int $timeout Timeout i sekunder
- * @return array Responsmatrise
- */
-function api_delete(string $url, ?array $data = null, array $headers = [], int $timeout = 10)
-{
-    return api_request('DELETE', $url, $data, $headers, $timeout);
 }
