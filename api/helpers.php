@@ -42,7 +42,7 @@ function send_success($data = null, $message = null, $code = 200)
     send_response($response, $code);
 }
 
-function send_error($message, $code = 400, $details = null)
+function send_error($message = "Bad Request", $code = 400, $details = null)
 {
     if ($details) {
         error_log("API Error [$code]: $details");
@@ -71,6 +71,7 @@ function validate_required($data, $fields)
     $missing = array_filter($fields, fn ($f) => empty(trim($data[$f] ?? '')));
     if ($missing) {
         send_error('Manglende felter: ' . implode(', ', $missing), 400);
+        exit;
     }
 }
 
@@ -78,29 +79,27 @@ function validate_required($data, $fields)
 
 function require_auth()
 {
-#     if (empty($_SESSION['Authentication'])) {
-#         send_error('Innlogging kreves', 401);
-#     }
-    return $_SERVER['Authentication'];
+    if (!isset($_SERVER["HTTP_AUTHENTICATION"])) {
+        send_error("Unauthorized", 401);
+        exit;
+    }
+
+    return $authenticated = authenticate($_SERVER["HTTP_AUTHENTICATION"]);
 }
 
-function start_session($student)
+function authenticate($user_token)
 {
-    $_SESSION['student_id']    = $student['user_id'];
-    $_SESSION['student_email'] = $student['mail'];
-    $_SESSION['student_name']  = $student['first_name'] . ' ' . $student['last_name'];
-}
+    $repository = new Repository();
 
-// ---------- FORMAT ----------
+    $user_id = $repository->getUserById($user_token);
 
-function format_student($row)
-{
-    return [
-        'id'          => $row['user_id'],
-        'first_name'  => $row['first_name'],
-        'last_name'   => $row['last_name'],
-        'email'       => $row['mail'],
-        'study_field' => $row['study_field'],
-        'class_year'  => $row['class_year'],
-    ];
+    if ($user_token == $user_id->user_id) {
+        return [
+            "authenticated" => true,
+            "user_id" => $user_id->user_id,
+            "role" => $user_id->role
+        ];
+    } else {
+        send_error("Unauthorized", 401);
+    }
 }

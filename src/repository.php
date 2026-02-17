@@ -38,14 +38,15 @@ class Repository
         return $result;
     }
 
-    public function sqlInit():void
+    public function getUserById(string $id): UserDto
     {
-        $initsql = file_get_contents("init.sql");
+        # TODO: Fjerne passord og lage nytt objekt for bruker uten passord
+        $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE user_id = ?");
+        $statement->execute([$id]);
+        $result = $statement->fetchObject("UserDto");
 
-        $this->dbh->exec($initsql);
-
+        return $result;
     }
-
 
     public function getUserLoginInfo(string $mail): UserLoginDto
     {
@@ -53,6 +54,35 @@ class Repository
 
         $statement->execute([$mail]);
         $result = $statement->fetchObject("UserLoginDto");
+
+        return $result;
+    }
+
+    public function getSecurityQuestionByMail(string $mail): string
+    {
+        $statement = $this->dbh->prepare("
+            SELECT security_question FROM lecturers l, users u
+            WHERE l.lecturer_id = u.user_id AND u.mail = ?
+            ");
+
+        $statement->execute([$mail]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $result["security_question"];
+
+    }
+
+    public function getSecurityAnswerByMail(string $mail): mixed
+    {
+        $statement = $this->dbh->prepare("
+            SELECT user_id, mail, security_question, security_answer FROM lecturers l, users u
+            WHERE l.lecturer_id = u.user_id AND u.mail = ?
+            ");
+
+        $statement->execute([$mail]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         return $result;
     }
@@ -148,16 +178,16 @@ class Repository
         return $result;
     }
 
-    public function getLecturerDataById(string $user_id): LecturerDataDto
+    public function getLecturerDataById(string $user_id): LecturerDto
     {
         $statement = $this->dbh->prepare("
-            SELECT avatar, security_question, security_answer FROM lecturers
-            WHERE lecturer_id = ?
+            SELECT lecturer_id, first_name, last_name, mail, avatar FROM lecturers l, users u
+            WHERE lecturer_id = user_id AND lecturer_id = ?
             ");
 
         $statement->execute([$user_id]);
 
-        $result = $statement->fetchObject("LecturerDataDto");
+        $result = $statement->fetchObject("LecturerDto");
 
         return $result;
     }
