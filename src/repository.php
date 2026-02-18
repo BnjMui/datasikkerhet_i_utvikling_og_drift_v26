@@ -300,8 +300,8 @@ class Repository
     {
         $statement = $this->dbh->prepare(
             "INSERT INTO messages
-                (student_id, course_id, created_at, text)
-            VALUES (?, ?, ?, ?)"
+                (student_id, course_id, text)
+            VALUES (?, ?, ?)"
         );
 
         try {
@@ -309,7 +309,6 @@ class Repository
             $statement->execute([
                 $message->student_id,
                 $message->course_id,
-                $message->created_at,
                 $message->text
             ]);
 
@@ -339,13 +338,13 @@ class Repository
     {
         $statement = $this->dbh->prepare(
             "INSERT INTO replies
-                (message_id, created_at, text)
-            VALUES (?, ?, ?)"
+                (message_id, text)
+            VALUES (?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$reply->message_id, $reply->created_at, $reply->text]);
+            $statement->execute([$reply->message_id, $reply->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
@@ -369,17 +368,17 @@ class Repository
         return $result;
     }
 
-    public function CreateComment(BaseMessageReplyType $comment): bool
+    public function createComment(BaseMessageReplyType $comment): bool
     {
         $statement = $this->dbh->prepare(
             "INSERT INTO comments
-                (message_id, created_at, text)
-            VALUES (?, ?, ?)"
+                (message_id, text)
+            VALUES (?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$comment->message_id, $comment->created_at, $comment->text]);
+            $statement->execute([$comment->message_id, $comment->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {
@@ -390,18 +389,18 @@ class Repository
     }
 
     # Reports
-    public function CreateReport(BaseMessageReplyType $report): bool
+    public function createReport(BaseMessageReplyType $report): bool
     {
 
         $statement = $this->dbh->prepare(
             "INSERT INTO reports
-                (message_id, created_at, text)
-            VALUES (?, ?, ?)"
+                (message_id, text)
+            VALUES (?, ?)"
         );
 
         try {
             $this->dbh->beginTransaction();
-            $statement->execute([$report->message_id, $report->created_at, $report->text]);
+            $statement->execute([$report->message_id, $report->text]);
 
             return $this->dbh->commit();
         } catch (Exception $e) {

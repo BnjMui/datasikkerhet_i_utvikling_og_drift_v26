@@ -7,39 +7,41 @@ $data = get_request_data();
 
 if ($method === "GET") {
     $pin_code = $data["pin_code"];
-    if (!$pin_code) {
+    if (!isset($pin_code)) {
         $authenticated = require_auth();
     }
 
     if ($pin_code) {
         $course_pin = repository()->getCoursePin($data["course_id"]);
-        if ($pin_code != $course_pin) {
+        if ($pin_code != $course_pin && !$authenticated["authenticated"]) {
             send_error("Unauthorized", 401);
         }
-        $result = repository()->getMessages($data["course_id"]);
-        send_success($result, "Success", 200);
-    }
-
-    if (!$authenticated["authenticated"]) {
-        send_error("Unauthorized", 401);
     }
 
     $result = repository()->getMessages($data["course_id"]);
 
+    foreach ($result as $message) {
+        $message_id = $message->message_id;
+
+        $message_replies = repository()->getReplies($message_id);
+        $message_comments = repository()->getComments($message_id);
+
+        $message->replies = $message_replies;
+        $message->comments = $message_comments;
+    }
+
     send_success($result, "Success", 200);
-    exit;
 }
 
 if ($method === "POST") {
-    validate_required($data, ["user_id", "course_id", "text"]);
-    // Autentiser som student
-    // Hvis ikke autentisert retuner 401
+    validate_required($data, ["course_id", "text"]);
     $authenticated = require_auth();
 
-    if (!$authenticated["authenticated"]) {
+    if (!$authenticated["authenticated"] || $authenticated["role"] != "student") {
         send_error("Unauthorized", 401);
     }
-    // Hvis autentisert lagre melding i database
+    # TODO Sjekk om student har kurset...
+
     $message = new CreateMessageDto();
 
     $message->student_id = $authenticated["user_id"];

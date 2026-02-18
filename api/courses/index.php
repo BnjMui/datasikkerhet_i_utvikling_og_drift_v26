@@ -9,8 +9,8 @@ $method = get_method();
 $data = get_request_data();
 
 if ($method === "GET") {
-    if ($data["id"]) {
-        $course_data = repository()->getCourseById($data["id"]);
+if (isset($data["id"])) {
+    $course_data = repository()->getCourseById($data["id"]);
         $lecturer_data = repository()->getLecturerDataById($course_data->lecturer_id);
 
         $result = [
@@ -19,7 +19,7 @@ if ($method === "GET") {
         ];
     }
 
-    if ($data["student_id"]) {
+    if (isset($data["student_id"])) {
         $result = repository()->getStudentCourses($data["student_id"]);
     }
 
