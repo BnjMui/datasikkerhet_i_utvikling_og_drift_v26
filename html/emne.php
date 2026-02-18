@@ -14,7 +14,7 @@ $rolle = ($bruker && isset($bruker['rolle'])) ? $bruker['rolle'] : 'guest';
 $currentPage = 'emne';
 
 // Hent emnekode fra URL og finn emnet
-$emneKode = isset($_GET['kode']) ? $_GET['kode'] : '';
+$emneKode = isset($_GET['course_id']) ? $_GET['course_id'] : '';
 $emne = finnEmne($emneKode);
 
 // Hvis bruker er innlogget (student eller foreleser), redirect direkte til meldinger
@@ -33,11 +33,13 @@ if ($bruker && $rolle !== 'guest' && $emne) {
 // PIN-kode verifisering (kun for guest)
 $pinFeil = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
-    if (sjekkEmnePin($emneKode, $_POST['pin'])) {
-        header("Location: guest_meldinger.php?kode=" . urlencode($emneKode));
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin_code'])) {
+    if (sjekkEmnePin($emneKode, $_POST['pin_code'])) {
+        // PIN riktig — send videre til meldinger
+        header("Location: guest_meldinger.php?course_id=" . urlencode($emneKode));
         exit;
     } else {
+        // PIN feil — vis feilmelding i skjemaet
         $pinFeil = true;
     }
 }
@@ -48,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $emne ? htmlspecialchars($emne['kode']) : 'Emne ikke funnet'; ?> - Emneportal</title>
+    <title><?php echo $emne ? htmlspecialchars($emne['course_code']) : 'Emne ikke funnet'; ?> - Emneportal</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 
@@ -74,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
         <?php elseif ($emne): ?>
             <article class="emne-container">
                 <header class="emne-header">
-                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['kode'])); ?></p>
-                    <h1><?php echo htmlspecialchars($emne['navn']); ?></h1>
+                    <p class="emne-kode"><?php echo htmlspecialchars(strtoupper($emne['course_code'])); ?></p>
+                    <h1><?php echo htmlspecialchars($emne['course_name']); ?></h1>
                 </header>
 
                 <section class="pin-section" aria-labelledby="pin-title">
@@ -91,12 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pin'])) {
 
                     <form method="POST" aria-describedby="pin-title">
                         <fieldset>
-                            <legend class="visually-hidden">PIN-kode for <?php echo htmlspecialchars($emne['kode']); ?></legend>
+                            <legend class="visually-hidden">PIN-kode for <?php echo htmlspecialchars($emne['course_code']); ?></legend>
 
                             <p class="form-group">
                                 <label for="pin">PIN-kode (4 siffer)</label>
                                 <input
-                                    id="pin"
+                                    id="pin_code"
                                     type="password"
                                     name="pin"
                                     class="pin-input"

@@ -29,7 +29,10 @@ function api_request(string $method, string $url, ?array $data = null, array $he
     $defaultHeaders = ['Accept: application/json'];
     $allHeaders = array_merge($defaultHeaders, $headers);
 
-    if ($data !== null) {
+    // For GET-forespørsler, legg data til som query-parametre i URL-en
+    if ($method === 'GET' && $data !== null) {
+        $url .= '?' . http_build_query($data);
+    } elseif ($data !== null) {
         // For andre metoder, send data som JSON-body
         $payload = json_encode($data);
         $allHeaders[] = 'Content-Type: application/json';

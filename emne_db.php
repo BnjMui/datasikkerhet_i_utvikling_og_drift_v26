@@ -5,14 +5,18 @@ include_once 'api_client.php';
 /**
  * Finn et emne basert på emnekode
  */
-function finnEmne($kode)
+function finnEmne($course_id, $pin_code = null)
 {
-    global $emner;
-    foreach ($emner as $emne) {
-        if (strtoupper($emne['kode']) === strtoupper($kode)) {
-            return $emne;
+    $response = api_request("GET", "/courses");
+
+    if (!empty($response['data'])) {
+        foreach ($response['data'] as $course) {
+            if ($course['course_id'] == $course_id) {
+                return $course;
+            }
         }
     }
+
     return null;
 }
 
@@ -21,19 +25,16 @@ function finnEmne($kode)
  */
 function hentAlleEmner()
 {
-    return api_request("GET", "/courses.php")['data'];
+    return api_request("GET", "/courses")['data'];
 }
 
 /**
  * Sjekk PIN-kode for et emne
  */
-function sjekkEmnePin($kode, $pin)
+function sjekkEmnePin($course_id, $pin_code)
 {
-    $emne = finnEmne($kode);
-    if ($emne && $emne['pin'] === $pin) {
-        return true;
-    }
-    return false;
+    $response = api_request("GET", "/courses?course_id=" . urlencode($course_id) . "&pin_code=" . urlencode($pin_code));
+    return !empty($response['data']);
 }
 
 /**

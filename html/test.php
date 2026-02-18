@@ -12,7 +12,7 @@ require_once '../api_client.php';
 </head>
 
 <body>
-    <?php print_r(api_get("/courses.php")['json']['data']); ?>
+    <?php print_r(api_request("GET", "/courses")); ?>
 </body>
 
 </html>

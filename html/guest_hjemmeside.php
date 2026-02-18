@@ -86,16 +86,16 @@ if ($rolle === 'foreleser') {
                             <li>
                                 <article class="emne-kort">
                                     <?php if ($rolle === 'guest'): ?>
-                                        <a href="emne.php?kode=<?php echo urlencode($emne['course_code']); ?>"
-                                            aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_code']); ?>">
+                                        <a href="emne.php?course_id=<?php echo urlencode($emne['course_id']); ?>"
+                                            aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_name']); ?>">
                                         <?php else: ?>
-                                            <a href="guest_meldinger.php?kode=<?php echo urlencode($emne['course_code']); ?>"
-                                                aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_code']); ?>">
+                                            <a href="guest_meldinger.php?course_id=<?php echo urlencode($emne['course_id']); ?>"
+                                                aria-label="<?php echo htmlspecialchars($emne['course_code'] . ' - ' . $emne['course_name']); ?>">
                                             <?php endif; ?>
                                             <header>
                                                 <h3 class="emne-kode"><?php echo htmlspecialchars($emne['course_code']); ?></h3>
                                             </header>
-                                            <p class="emne-navn"><?php echo htmlspecialchars($emne['course_code']); ?></p>
+                                            <p class="emne-navn"><?php echo htmlspecialchars($emne['course_name']); ?></p>
                                             </a>
                                 </article>
                             </li>
