@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS courses (
     course_id INT AUTO_INCREMENT PRIMARY KEY,
     lecturer_id VARCHAR(36) NOT NULL,
     course_code VARCHAR(14) NOT NULL UNIQUE,
+    course_name VARCHAR(50) NOT NULL,
     pin_code CHAR(4),
     FOREIGN KEY (lecturer_id) REFERENCES lecturers(lecturer_id) ON DELETE CASCADE
 );

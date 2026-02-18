@@ -38,14 +38,15 @@ class Repository
         return $result;
     }
 
-    public function sqlInit():void
+    public function getUserById(string $id): UserDto
     {
-        $initsql = file_get_contents("init.sql");
+        # TODO: Fjerne passord og lage nytt objekt for bruker uten passord
+        $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE user_id = ?");
+        $statement->execute([$id]);
+        $result = $statement->fetchObject("UserDto");
 
-        $this->dbh->exec($initsql);
-
+        return $result;
     }
-
 
     public function getUserLoginInfo(string $mail): UserLoginDto
     {
@@ -53,6 +54,35 @@ class Repository
 
         $statement->execute([$mail]);
         $result = $statement->fetchObject("UserLoginDto");
+
+        return $result;
+    }
+
+    public function getSecurityQuestionByMail(string $mail): string
+    {
+        $statement = $this->dbh->prepare("
+            SELECT security_question FROM lecturers l, users u
+            WHERE l.lecturer_id = u.user_id AND u.mail = ?
+            ");
+
+        $statement->execute([$mail]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $result["security_question"];
+
+    }
+
+    public function getSecurityAnswerByMail(string $mail): mixed
+    {
+        $statement = $this->dbh->prepare("
+            SELECT user_id, mail, security_question, security_answer FROM lecturers l, users u
+            WHERE l.lecturer_id = u.user_id AND u.mail = ?
+            ");
+
+        $statement->execute([$mail]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         return $result;
     }
@@ -148,16 +178,16 @@ class Repository
         return $result;
     }
 
-    public function getLecturerDataById(string $user_id): LecturerDataDto
+    public function getLecturerDataById(string $user_id): LecturerDto
     {
         $statement = $this->dbh->prepare("
-            SELECT avatar, security_question, security_answer FROM lecturers
-            WHERE lecturer_id = ?
+            SELECT lecturer_id, first_name, last_name, mail, avatar FROM lecturers l, users u
+            WHERE lecturer_id = user_id AND lecturer_id = ?
             ");
 
         $statement->execute([$user_id]);
 
-        $result = $statement->fetchObject("LecturerDataDto");
+        $result = $statement->fetchObject("LecturerDto");
 
         return $result;
     }
@@ -170,7 +200,7 @@ class Repository
     public function getCourses(): array
     {
         $statement = $this->dbh->prepare(
-            "SELECT course_id, lecturer_id, course_code FROM courses"
+            "SELECT course_id, lecturer_id, course_code, course_name FROM courses"
         );
 
         $statement->execute();
@@ -184,7 +214,7 @@ class Repository
     */
     public function getStudentCourses(string $user_id): array
     {
-        $statement = $this->dbh->prepare("SELECT c.course_id, lecturer_id, course_code, pin_code FROM courses c, students_courses s WHERE c.course_id = s.course_id AND s.student_id = ?");
+        $statement = $this->dbh->prepare("SELECT c.course_id, lecturer_id, course_code, course_name, pin_code FROM courses c, students_courses s WHERE c.course_id = s.course_id AND s.student_id = ?");
 
         $statement->execute([$user_id]);
         $result = $statement->fetchAll(PDO::FETCH_CLASS, "CourseDto");
@@ -194,7 +224,7 @@ class Repository
 
     public function getCourseById(int $course_id): CourseDto
     {
-        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, pin_code FROM courses WHERE course_id = ?");
+        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, course_name, pin_code FROM courses WHERE course_id = ?");
 
         $statement->execute([$course_id]);
 
@@ -208,12 +238,12 @@ class Repository
         // TODO legg til createCourse objekt som property i CreateLecturerDto objektet
         $statement = $this->dbh->prepare(
             "INSERT INTO courses
-                (lecturer_id, course_code, pin_code)
-            VALUES(?, ?, ?)"
+                (lecturer_id, course_code, course_name, pin_code)
+            VALUES(?, ?, ?, ?)"
         );
 
         try {
-            $statement->execute([$lecturer_id, $courseData->course_code, $courseData->pin_code]);
+            $statement->execute([$lecturer_id, $courseData->course_code, $courseData->course_name, $courseData->pin_code]);
             return true;
         } catch (Exception $e) {
             throw $e;
