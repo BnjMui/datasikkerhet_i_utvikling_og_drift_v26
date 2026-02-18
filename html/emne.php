@@ -4,6 +4,7 @@ session_start();
 // Inkluder emnedata og brukerdata
 require_once '../emne_db.php';
 require_once '../bruker_db.php';
+require_once '../api_client.php';
 
 // Hent brukerinfo fra session
 $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
