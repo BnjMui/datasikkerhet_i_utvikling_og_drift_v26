@@ -233,6 +233,17 @@ class Repository
         return $result;
     }
 
+    public function getCoursePin(int $course_id): mixed
+    {
+        $statement = $this->dbh->prepare("SELECT pin_code FROM courses WHERE course_id = ?");
+
+        $statement->execute([$course_id]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $result["pin_code"];
+    }
+
     public function createCourse(string $lecturer_id, CreateCourseDto $courseData): bool
     {
         // TODO legg til createCourse objekt som property i CreateLecturerDto objektet

@@ -28,6 +28,7 @@ function send_response($response, $code = 200)
 {
     http_response_code($code);
     die(json_encode($response));
+    exit;
 }
 
 function send_success($data = null, $message = null, $code = 200)
