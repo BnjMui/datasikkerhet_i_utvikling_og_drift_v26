@@ -16,7 +16,7 @@ if ($method === 'POST') {
     }
 
     if ($data["role"] == "lecturer") {
-        $valid = validate_required($data, ["first_name", "last_name", "mail", "password", "role", "avatar", "security_question", "security_answer", "course_code", "pin_code"]);
+        $valid = validate_required($data, ["first_name", "last_name", "mail", "password", "role", "avatar", "security_question", "security_answer", "course_code", "course_name", "pin_code"]);
     }
 
     if (!filter_var($data['mail'], FILTER_VALIDATE_EMAIL)) {
@@ -46,6 +46,7 @@ if ($method === 'POST') {
             break;
         case 'lecturer':
             $user_object = new CreateLecturerDto();
+            $hashed_security_answer = password_hash($data["security_answer"], PASSWORD_BCRYPT);
 
             $user_object->first_name = $data["first_name"];
             $user_object->last_name = $data["last_name"];
@@ -55,9 +56,10 @@ if ($method === 'POST') {
 
             $user_object->avatar = $data["avatar"];
             $user_object->security_question = $data["security_question"];
-            $user_object->security_answer = $data["security_answer"];
+            $user_object->security_answer = $hashed_security_answer;
 
             $user_object->course->course_code = $data["course_code"];
+            $user_object->course->course_name = $data["course_name"];
             $user_object->course->pin_code = $data["pin_code"];
 
             $success = $repository->createLecturer($user_object);

@@ -200,7 +200,7 @@ class Repository
     public function getCourses(): array
     {
         $statement = $this->dbh->prepare(
-            "SELECT course_id, lecturer_id, course_code FROM courses"
+            "SELECT course_id, lecturer_id, course_code, course_name FROM courses"
         );
 
         $statement->execute();
@@ -214,7 +214,7 @@ class Repository
     */
     public function getStudentCourses(string $user_id): array
     {
-        $statement = $this->dbh->prepare("SELECT c.course_id, lecturer_id, course_code, pin_code FROM courses c, students_courses s WHERE c.course_id = s.course_id AND s.student_id = ?");
+        $statement = $this->dbh->prepare("SELECT c.course_id, lecturer_id, course_code, course_name, pin_code FROM courses c, students_courses s WHERE c.course_id = s.course_id AND s.student_id = ?");
 
         $statement->execute([$user_id]);
         $result = $statement->fetchAll(PDO::FETCH_CLASS, "CourseDto");
@@ -224,7 +224,7 @@ class Repository
 
     public function getCourseById(int $course_id): CourseDto
     {
-        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, pin_code FROM courses WHERE course_id = ?");
+        $statement = $this->dbh->prepare("SELECT course_id, lecturer_id, course_code, course_name, pin_code FROM courses WHERE course_id = ?");
 
         $statement->execute([$course_id]);
 
@@ -238,12 +238,12 @@ class Repository
         // TODO legg til createCourse objekt som property i CreateLecturerDto objektet
         $statement = $this->dbh->prepare(
             "INSERT INTO courses
-                (lecturer_id, course_code, pin_code)
-            VALUES(?, ?, ?)"
+                (lecturer_id, course_code, course_name, pin_code)
+            VALUES(?, ?, ?, ?)"
         );
 
         try {
-            $statement->execute([$lecturer_id, $courseData->course_code, $courseData->pin_code]);
+            $statement->execute([$lecturer_id, $courseData->course_code, $courseData->course_name, $courseData->pin_code]);
             return true;
         } catch (Exception $e) {
             throw $e;

@@ -19,10 +19,12 @@ if ($method === "GET") {
 }
 
 if ($method === 'POST') {
+    validate_required($data, ["mail", "security_answer", "new_password"]);
+    
 
     $security_answer = $repository->getSecurityAnswerByMail($data["mail"]);
 
-    if ($data["security_answer"] != $security_answer["security_answer"]) {
+    if (!password_verify($data["security_answer"], $security_answer["security_answer"])) {
         send_error("Answer is not correct", 404);
     }
 
