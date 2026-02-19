@@ -1,6 +1,6 @@
 <?php
 
-include_once 'api_client.php';
+include_once __DIR__ . "/" . 'api_client.php';
 
 function get_course($course_id, $pin_code = null)
 {
@@ -8,12 +8,12 @@ function get_course($course_id, $pin_code = null)
         $response = api_request("GET", "/courses?course_id=$course_id&pin_code=$pin_code");
 
         $message_data = api_request("GET", "/messages?course_id=$course_id&pin_code=$pin_code");
-        $data = ["lecturer" => $response["lecturer"], "course" => $response["course"], "messages" => $message_data];
+        $data = ["lecturer" => $response["data"]["lecturer"], "course" => $response["data"]["course"], "messages" => $message_data["data"]];
 
-        if ($data["success"]) {
-            return $data["data"];
+        if ($response["success"]) {
+            return $data;
         }
-        return $data["success"];
+        return $response["success"];
 
     }
 
@@ -21,12 +21,12 @@ function get_course($course_id, $pin_code = null)
     $response = api_request("GET", "/courses?course_id=$course_id", [], ["AUTHENTICATION: $auth_token"]);
 
     $message_data = api_request("GET", "/messages?course_id=$course_id", [], ["AUTHENTICATION: $auth_token"]);
-    $data = ["lecturer" => $response["lecturer"], "course" => $response["course"], "messages" => $message_data];
+    $data = ["lecturer" => $response["data"]["lecturer"], "course" => $response["data"]["course"], "messages" => $message_data];
 
-    if ($data["success"]) {
-        return $data["data"];
+    if ($response["success"]) {
+        return $data;
     }
-    return $data["success"];
+    return $response["success"];
 }
 
 function get_courses()
@@ -38,6 +38,25 @@ function get_courses()
         return $data["data"];
     }
     return $data["success"];
+}
+
+function get_student_courses()
+{
+    $auth_token = $_SESSION["session_data"]["user_id"];
+    $course = "courses";
+    $data = api_request("GET", "/courses?student_id=$auth_token", [], ["AUTHENTICATION: $auth_token"]);
+
+    if ($data["success"] && isset($data["data"])) {
+        return $data["data"];
+    }
+    return [];
+}
+
+function student_add_course($student_id, $course_id)
+{
+    $auth_token = $_SESSION["session_data"]["user_id"];
+    $response = api_request("POST", "/courses", ["student_id" => $student_id, "course_id" => $course_id], ["AUTHENTICATION: $auth_token"]);
+    return $response;
 }
 
 function create_message($course_id, $text)

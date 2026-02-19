@@ -2,7 +2,7 @@
 
 // Simulerte brukere - studenter og forelesere
 require_once __DIR__ . "/" . 'course_api_service.php';
-require_once __DIR__ . "/" . "api_client.php";
+include_once __DIR__ . "/" . "api_client.php";
 
 
 function get_login($mail, $password)

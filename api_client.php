@@ -1,14 +1,12 @@
 <?php
 
-require_once __DIR__ . "/" . "config.php";
-
 function api_request(string $method, string $url, array $data = [], array $headers = [])
 {
     if (!function_exists('curl_init')) {
         return ['ok' => false, 'error' => 'cURL not available'];
     }
 
-    $base_api_url = "http://localhost:8001/api";
+    $base_api_url = "http://localhost:8001/steg1/api";
 
     $ch = curl_init();
     $method = strtoupper($method);
