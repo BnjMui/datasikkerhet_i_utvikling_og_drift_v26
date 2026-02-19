@@ -9,7 +9,10 @@ function get_login($mail, $password)
 {
     $data = api_request("POST", "/users/login", ["mail" => $mail, "password" => $password]);
 
-    return $data;
+    if ($data["success"]) {
+        return $data["data"];
+    }
+    return $data["success"];
 }
 
 
@@ -26,7 +29,9 @@ function register_student($first_name, $last_name, $mail, $password, $study_fiel
         "study_field" => $study_field,
         "class_year" => $class_year
     ]);
-    return $result;
+    if ($result["success"]) {
+        return $result["success"];
+    }
 }
 
 function register_lecturer($first_name, $last_name, $mail, $password, $avatar, $security_question, $security_answer, $course_code, $course_name, $pin_code)
@@ -46,7 +51,10 @@ function register_lecturer($first_name, $last_name, $mail, $password, $avatar, $
         "course_name" => $course_name,
         "pin_code" => $pin_code
         ]);
-    return $result;
+
+    if ($result["success"]) {
+        return $result["success"];
+    }
 }
 
 
@@ -56,22 +64,22 @@ function register_lecturer($first_name, $last_name, $mail, $password, $avatar, $
 /**
  * Oppdater passord for bruker
  */
-function oppdaterPassord($userId, $nyttPassord)
+function change_password($new_password)
 {
-    global $brukere;
+    $user_id_token = $_SESSION["session_data"]["user_id"];
+    $result = api_request("POST", "/users/update_password", ["new_password" => $new_password], ["AUTHENTICATION: $user_id_token"]);
 
-    $hashedPassword = password_hash($nyttPassord, PASSWORD_DEFAULT);
+    return $result["success"];
+}
+function get_security_question($mail)
+{
+    $result = api_request("GET", "/users/forgot_password?mail=$mail");
+        return $result["data"];
+}
+function forgot_password($mail, $security_answer, $new_password)
+{
+    # validate_required($data, ["mail", "security_answer", "new_password"]);
+    $result = api_request("POST", "/users/forgot_password", ["mail" => $mail, "security_answer" => $security_answer, "new_password" => $new_password]);
 
-    // Oppdater i memory array
-    foreach ($brukere as &$bruker) {
-        if ($bruker['id'] === $userId) {
-            $bruker['passord'] = $hashedPassword;
-            break;
-        }
-    }
-
-    // Lagre til JSON
-    lagreBrukereJson();
-
-    return true;
+    return $result;
 }

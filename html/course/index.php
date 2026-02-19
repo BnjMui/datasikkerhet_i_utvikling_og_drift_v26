@@ -115,11 +115,11 @@ if ($course) {
                 </p>
                 </header>
             <section>
-                <h2>Foreleser i emnet</h2>
+                <h2>Emneansvarlig</h2>
+                <img src="../register/<?php echo $lecturer["avatar"];?>" width="250"/>
                 <p>
                     <?php echo $lecturer["first_name"] . " " . $lecturer["last_name"]; ?>
                 </p>
-                <img src=<?php echo $lecturer["avatar"];?> />
             </section>
             <section>
                 <h2>Meldinger</h2>

@@ -1,6 +1,28 @@
 <?php
+require_once __DIR__ . "/" . "../../login_api_service.php";
 session_start();
 
+$error_message = "";
+$success = false;
+
+// Håndter innlogging
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $new_password = $_POST["new_password"];
+    $password_matches = $new_password == $_POST["new_password_confirm"];
+
+    if (!$password_matches) {
+        $error_message = "Passordene er ikke like";
+    }
+    if ($password_matches) {
+        $result = change_password($new_password);
+
+        if (!$result) {
+            $error_message = "Ukjent feil";
+        }
+        header("Location: /");
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -13,72 +35,53 @@ session_start();
 </head>
 
 <body>
-    <?php include __DIR__ . '/../header.php'; ?>
+    <?php include __DIR__ . "/" . '../../header.php'; ?>
     <main>
-        <article class="login-container">
+        <section class="login-container">
             <header>
                 <h1>Endre passord</h1>
             </header>
 
-            <?php if ($suksessmelding): ?>
+            <?php if ($success): ?>
                 <p class="success-message" role="status">
-                    <?php echo htmlspecialchars($suksessmelding); ?>
+                    Passord endret!
                 </p>
             <?php endif; ?>
 
-            <form method="POST" aria-labelledby="change-title">
+            <form method="POST" action="" class="form-group">
                 <fieldset>
-                    <legend class="visually-hidden">Passordendring</legend>
-
-                    <p class="form-group">
-                        <label for="gammel_passord">Gammelt passord *</label>
+                    <legend>Endre passord</legend>
+                        <label for="new_password">Nytt passord *</label>
                         <input
-                            id="gammel_passord"
+                            id="new_password"
                             type="password"
-                            name="gammel_passord"
-                            autocomplete="current-password"
-                            required>
-                    </p>
-
-                    <p class="form-group">
-                        <label for="nytt_passord">Nytt passord *</label>
-                        <input
-                            id="nytt_passord"
-                            type="password"
-                            name="nytt_passord"
+                            name="new_password"
                             autocomplete="new-password"
                             required
-                            minlength="6">
-                    </p>
+                            minlength="8">
 
-                    <p class="form-group">
-                        <label for="nytt_passord_bekreft">Bekreft nytt passord *</label>
+                        <label for="new_password_confirm">Bekreft nytt passord *</label>
                         <input
-                            id="nytt_passord_bekreft"
+                            id="new_password_confirm"
                             type="password"
-                            name="nytt_passord_bekreft"
+                            name="new_password_confirm"
                             autocomplete="new-password"
                             required
-                            minlength="6">
-                    </p>
+                            minlength="8">
                 </fieldset>
 
                 <button type="submit">Endre passord</button>
 
-                <?php if ($feilmelding): ?>
+                <?php if ($error_message): ?>
                     <p class="error-message" role="alert">
-                        <strong>Feil:</strong> <?php echo htmlspecialchars($feilmelding); ?>
+                        <strong>Feil:</strong> <?php echo htmlspecialchars($error_message); ?>
                     </p>
                 <?php endif; ?>
             </form>
-
-            <section>
-                <p><a href="guest_hjemmeside.php">Tilbake til hjemmeside</a></p>
-            </section>
-        </article>
+        </section>
     </main>
 
-    <?php include __DIR__ . '/../footer.php'; ?>
+    <?php include __DIR__ . "/" . '../../footer.php'; ?>
 </body>
 
 </html>

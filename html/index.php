@@ -50,7 +50,7 @@ $courses = get_courses();
                 <p><strong>E-post:</strong> <?php echo htmlspecialchars($user['mail']); ?></p>
                 <p><strong>Rolle:</strong> <?php echo ucfirst(htmlspecialchars($user['role'])); ?></p>
                 <p>
-                    <a href="passordbytte.php">
+                    <a href="/change_password">
                         Endre passord
                     </a>
                 </p>

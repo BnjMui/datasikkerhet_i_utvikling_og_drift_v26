@@ -1,6 +1,33 @@
 <?php
+require_once __DIR__ . "/" . "../../../login_api_service.php";
 session_start();
 
+$error_message = "";
+$success = false;
+
+// Håndter innlogging
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_POST["new_password"]) {
+        $new_password = $_POST["new_password"];
+        $password_matches = $new_password == $_POST["new_password_confirm"];
+
+        if (!$password_matches) {
+            $error_message = "Passordene er ikke like";
+        }
+        if ($password_matches) {
+
+            $result = forgot_password($_POST["mail"], $_POST["security_answer"], $new_password);
+
+            header("Location: /login");
+        }
+    }
+    if (!$_POST["new_password"] && $_POST["mail"]) {
+        $result = get_security_question($_POST["mail"]);
+
+        $security_question = $result;
+    }
+
+}
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -20,59 +47,46 @@ session_start();
                 <h1>Glemt passord (Foreleser)</h1>
             </header>
 
-            <?php if ($suksessmelding): ?>
-                <p class="success-message"><?php echo htmlspecialchars($suksessmelding); ?></p>
-                <p><a href="login.php">Gå til innlogging</a></p>
-            <?php else: ?>
+            <?php if ($success): ?>
+                <p class="success-message">Passord endret!</p>
+                <p><a href="/login">Gå til innlogging</a></p>
+                <?php endif ?>
+            <?php if (!$security_question): ?>
 
-                <?php if ($step === 1): ?>
-                    <form method="POST" aria-label="Be om sikkerhetsspørsmål">
-                        <input type="hidden" name="action" value="request">
-                        <p class="form-group">
-                            <label for="email">E-postadresse</label>
-                            <input id="email" type="email" name="email" required>
-                        </p>
+                    <form method="POST" aria-label="Be om sikkerhetsspørsmål" class="form-group">
+                            <label for="mail">E-postadresse</label>
+                            <input id="mail" type="email" name="mail" required>
                         <button type="submit">Hent sikkerhetsspørsmål</button>
                     </form>
-                <?php endif; ?>
+                <?php endif ?>
 
-                <?php if ($step === 2): ?>
-                    <?php $user = $user ?? finnBrukerMedEmail($_POST['email'] ?? ''); ?>
-                    <form method="POST" aria-label="Svar sikkerhetsspørsmål">
-                        <input type="hidden" name="action" value="reset">
-                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($user['email']); ?>">
+                <?php if ($security_question): ?>
+                    <form method="POST" action="" aria-label="Svar sikkerhetsspørsmål" class="form-group">
+                        <input type="hidden" name="mail" value="<?php echo $_POST['mail']; ?>">
+                    <?php echo $_POST["mail"]; ?>
 
-                        <p class="form-group">
                             <label>Sikkerhetsspørsmål</label>
-                        <p><strong><?php echo htmlspecialchars($user['sikkerhet_sporsmal']); ?></strong></p>
-                        </p>
+                        <p><strong><?php echo htmlspecialchars($security_question); ?></strong></p>
 
-                        <p class="form-group">
-                            <label for="svar">Svar</label>
-                            <input id="svar" type="text" name="svar" required>
-                        </p>
+                            <label for="security_answer">Svar</label>
+                            <input id="security_answer" type="text" name="security_answer" required>
 
-                        <p class="form-group">
-                            <label for="nytt_passord">Nytt passord</label>
-                            <input id="nytt_passord" type="password" name="nytt_passord" required minlength="6">
-                        </p>
+                            <label for="new_password">Nytt passord</label>
+                            <input id="new_password" type="password" name="new_password" required minlength="8">
 
-                        <p class="form-group">
-                            <label for="nytt_passord_bekreft">Bekreft nytt passord</label>
-                            <input id="nytt_passord_bekreft" type="password" name="nytt_passord_bekreft" required minlength="6">
-                        </p>
+                            <label for="new_password_confirm">Bekreft nytt passord</label>
+                            <input id="new_password_confirm" type="password" name="new_password_confirm" required minlength="8">
 
                         <button type="submit">Reset passord</button>
                     </form>
                 <?php endif; ?>
 
-                <?php if ($feilmelding): ?>
-                    <p class="error-message" role="alert"><?php echo htmlspecialchars($feilmelding); ?></p>
+                <?php if ($error_message): ?>
+                    <p class="error-message" role="alert"><?php echo htmlspecialchars($error_message); ?></p>
                 <?php endif; ?>
 
-            <?php endif; ?>
 
-            <p><a href="login.php">Tilbake til innlogging</a></p>
+            <p><a href="/login">Tilbake til innlogging</a></p>
         </article>
     </main>
     <?php include __DIR__ . '/../footer.php'; ?>

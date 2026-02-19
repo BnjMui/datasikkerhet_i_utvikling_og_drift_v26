@@ -12,11 +12,6 @@ if (isset($_SESSION['user']) && isset($_SESSION['user']['rolle'])) {
 $error_message = '';
 $suksessmelding = '';
 
-// Hent success meldinger fra GET
-if (isset($_GET['success'])) {
-    $suksessmelding = 'Registrering vellykket! Logg inn med dine opplysninger.';
-}
-
 // Håndter innlogging
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mail = isset($_POST['mail']) ? trim($_POST['mail']) : '';
@@ -96,7 +91,7 @@ $rolle = 'guest';
 
             <section>
                 <p>Har du ikke en konto? <a href="/register">Registrer deg her</a></p>
-                <p>Glemt passord som foreleser? <a href="glemt_passord_foreleser.php">Tilbakestill her</a></p>
+                <p>Glemt passord som foreleser? <a href="login/forgot_password">Tilbakestill her</a></p>
             </section>
         </article>
     </main>

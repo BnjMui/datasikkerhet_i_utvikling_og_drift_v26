@@ -34,14 +34,14 @@ function api_request(string $method, string $url, array $data = [], array $heade
     // Håndter cURL-feil
     if ($response === false) {
         return [
-            'ok' => false,
+            'success' => false,
             'error' => $curlErr ?: 'Unknown cURL error',
             'status' => 0
         ];
     }
 
     $data = json_decode($response, true);
-    if ($data["success"]) {
-        return $data["data"];
+    if ($data) {
+        return $data;
     }
 }
