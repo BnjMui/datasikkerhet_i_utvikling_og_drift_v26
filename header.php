@@ -1,44 +1,36 @@
 <?php
-// Hent brukerinfo hvis ikke allerede satt
-if (!isset($bruker)) {
-    $bruker = isset($_SESSION['user']) ? $_SESSION['user'] : null;
-}
-if (!isset($rolle)) {
-    $rolle = ($bruker && isset($bruker['rolle'])) ? $bruker['rolle'] : 'guest';
-}
-
-// Hent brukernavn trygt
-$brukerNavn = ($bruker && isset($bruker['navn'])) ? $bruker['navn'] : '';
+    $user = isset($_SESSION['session_data']) ? $_SESSION['session_data'] : null;
 ?>
 <header role="banner">
     <nav aria-label="Hovednavigasjon">
-        <a href="./guest_hjemmeside.php" class="logo">
+        <a href="/" class="logo">
             <span aria-hidden="true"></span> Studentportal
         </a>
     </nav>
 
     <aside class="bruker-seksjon" aria-label="Brukerinformasjon">
-        <?php if ($bruker && $rolle !== 'guest'): ?>
+        <?php if ($user): ?>
             <p class="bruker-info">
                 <span class="bruker-rolle">
                     <?php
-                    if ($rolle === 'student') {
-                        echo '<span aria-hidden="true"></span> Student';
-                    } elseif ($rolle === 'foreleser') {
-                        echo '<span aria-hidden="true"></span> Foreleser';
-                    }
+                if ($user != null):
+                if ($user["role"] == "student") {
+                echo "Student";
+                }
+                if ($user["role"] == "lecturer") {
+                echo "Foreleser";
+                }
                     ?>
                 </span>
-                <?php if (!empty($brukerNavn)): ?>
-                    <strong class="bruker-navn"><?php echo htmlspecialchars($brukerNavn); ?></strong>
+                    <strong class="bruker-navn"><?php echo htmlspecialchars($user["first_name"]); ?></strong>
                 <?php endif; ?>
             </p>
-            <a href="../logout.php" class="btn-logout">Logg ut</a>
+            <a href="logout.php" class="btn-logout">Logg ut</a>
         <?php else: ?>
             <p class="guest-info">
                 <span aria-hidden="true"></span> Gjest
             </p>
-            <a href="login.php" class="btn-login">Logg inn</a>
+            <button  class="btn-login"><a href="/login">Logg inn</a></button>
         <?php endif; ?>
     </aside>
 </header>

@@ -69,7 +69,7 @@ if ($method === 'POST') {
             break;
     }
     if ($success) {
-        send_success($user_object, "Created", 201);
+        send_success(null, "Created", 204);
         exit;
     }
 

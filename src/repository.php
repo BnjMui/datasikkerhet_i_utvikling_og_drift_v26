@@ -2,8 +2,6 @@
 
 require_once "db.php";
 
-require_once "entities/user.php";
-
 require_once "models/create_user_dto.php";
 require_once "models/create_student_dto.php";
 require_once "models/create_lecturer_dto.php";
@@ -41,7 +39,7 @@ class Repository
     public function getUserById(string $id): UserDto
     {
         # TODO: Fjerne passord og lage nytt objekt for bruker uten passord
-        $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role, password FROM users WHERE user_id = ?");
+        $statement = $this->dbh->prepare("SELECT user_id, first_name, last_name, mail, role FROM users WHERE user_id = ?");
         $statement->execute([$id]);
         $result = $statement->fetchObject("UserDto");
 

@@ -1,8 +1,5 @@
 <?php
 
-// api/login.php
-// POST /api/login.php
-
 require_once __DIR__ . "/" . '../../helpers.php';
 
 $method = get_method();
@@ -24,7 +21,9 @@ if ($method === 'POST') {
         exit;
     }
 
-    send_success($user_data->user_id, "Success", 200);
+    $result = repository()->getUserById($user_data->user_id);
+
+    send_success($result, "Success", 200);
 }
 
-send_response(['success' => false, 'error' => 'Metode ikke tillatt'], 405);
+send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

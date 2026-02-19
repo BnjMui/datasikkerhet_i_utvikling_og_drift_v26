@@ -9,8 +9,23 @@ $method = get_method();
 $data = get_request_data();
 
 if ($method === "GET") {
-if (isset($data["id"])) {
-    $course_data = repository()->getCourseById($data["id"]);
+    # Get Courses
+    if (!$data) {
+        $result = repository()->getCourses();
+    }
+
+    if (isset($data["course_id"])) {
+        if (!isset($data["pin_code"])) {
+            $authenticated = require_auth();
+        }
+        if ($data["pin_code"]) {
+            $course_pin = repository()->getCoursePin($data["course_id"]);
+            if ($data["pin_code"] != $course_pin) {
+                send_error("Unauthorized", 401);
+            }
+        }
+
+        $course_data = repository()->getCourseById($data["course_id"]);
         $lecturer_data = repository()->getLecturerDataById($course_data->lecturer_id);
 
         $result = [
@@ -19,16 +34,13 @@ if (isset($data["id"])) {
         ];
     }
 
-    if (isset($data["student_id"])) {
+    if (isset($data["student_id"]) && $data["student_id"] == $authenticated["user_id"]) {
         $result = repository()->getStudentCourses($data["student_id"]);
     }
 
-    if (!$data) {
-        $result = repository()->getCourses();
+    if ($result) {
+        send_success($result, "OK");
     }
-
-    send_success($result, "OK");
-    exit;
 }
 
 
