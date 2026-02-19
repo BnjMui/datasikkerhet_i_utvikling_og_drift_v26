@@ -1,0 +1,564 @@
+Erik Moræus - erikam@hiof.no
+Sami Isac – samiia@hiof.no 
+Martinius Mobakken - martimob@hiof.no
+Jonas Andersen Evensen – jonasae@hiof.no
+
+
+
+Html > change password > index.php
+Endre passord – funksjonalitet
+Det er utviklet en side for endring av passord i Emneportalen. Løsningen er laget med PHP, HTML og CSS, og bruker sesjonsbasert innlogging.
+Brukeren kan skrive inn nytt passord og bekrefte dette i et skjema. Systemet sjekker at passordene matcher og oppfyller minimumskrav før funksjonen for passordendring kjøres. Ved vellykket endring blir brukeren sendt tilbake til forsiden. Eventuelle feilmeldinger vises på siden.
+
+Teknologi og struktur
+•	PHP for serverlogikk
+•	Session-håndtering (session_start)
+•	Ekstern tjenestefil for passordendring
+•	Semantisk HTML (main, section, fieldset)
+•	Gjenbruk av header.php og footer.php
+•	Egen CSS for styling
+Html > course > index.php
+Det er utviklet en dynamisk emneside som henter og viser informasjon om et valgt emne basert på course_id. Løsningen er laget med PHP, HTML og CSS, og bruker sessions for å håndtere innlogget bruker.
+Dersom brukeren ikke er innlogget, må en 4-sifret PIN-kode skrives inn for å få tilgang til innholdet. Når tilgang er gitt, vises emneinformasjon, emneansvarlig, meldinger, svar og kommentarer. Det er også mulig å sende meldinger eller kommentarer via skjema.
+Teknisk er løsningen delt opp i egne service-filer for håndtering av emnedata og brukerinformasjon, samt gjenbruk av felles header og footer.
+Teknologi/struktur
+•	PHP for logikk og innhenting av data
+•	Sessions for å holde på brukerdata og PIN
+•	HTML + CSS for visning (semantiske elementer som main, nav, section, article)
+•	Gjenbruk av felles layout via header.php og footer.php
+•	Separate “service”-filer (course_api_service.php, login_api_service.php, api_client.php) for funksjoner og API-kall
+Html > courses > post_comment.php
+•	Leser inn course_id, tekst (message), og eventuelle felt som pin_code og message_id fra et POST-skjema.
+•	Hvis brukeren ikke er innlogget, kan vedkommende:
+o	legge inn kommentar på en melding
+o	sende inn en rapport
+•	Hvis brukeren er student, opprettes en ny melding i emnet.
+•	Hvis brukeren er foreleser, opprettes et svar (reply) på en eksisterende melding.
+•	Etter innsending blir brukeren automatisk sendt tilbake til riktig emneside.
+Teknologi og struktur
+•	PHP for serverlogikk og håndtering av POST-data
+•	Session-håndtering for å identifisere brukertype (student/foreleser/gjest)
+•	Egen service-fil (course_api_service.php) for funksjoner som:
+o	create_message()
+o	create_comment()
+o	create_reply()
+o	create_report()
+•	Redirect med header() for å sende bruker tilbake til emnesiden
+•	Strukturert oppdeling mellom presentasjonskode (emneside) og logikk (egen handler-fil)
+Html > login > forgot password > index.php
+Dette er en side for “glemt passord” for foreleser, bygget som en enkel prosess i to steg:
+•	Steg 1: Brukeren skriver inn e-postadresse for å hente tilhørende sikkerhetsspørsmål.
+•	Steg 2: Brukeren svarer på sikkerhetsspørsmålet og skriver inn nytt passord (med bekreftelse). Hvis passordene matcher, sendes reset-forespørselen inn og brukeren blir sendt tilbake til innlogging.
+Teknologi og struktur
+•	PHP for serverlogikk og håndtering av POST-skjema
+•	Session (session_start) for å støtte innloggingsflyt (samme struktur som resten av løsningen)
+•	Funksjoner fra login_api_service.php, bl.a.:
+o	get_security_question()
+o	forgot_password()
+•	HTML + CSS for skjema og visning, med required og minlength for enkel input-validering
+•	Gjenbruk av felles layout gjennom header.php og footer.php
+•	Redirect til /login etter gjennomført passordbytte
+Html > login > index.php
+Dette er en innloggingsside der brukere kan logge inn som student eller foreleser med e-post og passord.
+•	Skjema tar imot e-post og passord.
+•	Ved innsending kalles en funksjon som sjekker innloggingen.
+•	Hvis innlogging lykkes, lagres brukerdata i session og brukeren sendes til forsiden.
+•	Hvis innlogging feiler, vises en feilmelding.
+•	Siden har lenker til registrering og “glemt passord” for foreleser.
+Teknologi og struktur
+•	PHP for serverlogikk og håndtering av POST
+•	Sessions (session_start) for å lagre innlogget bruker (session_data)
+•	Funksjon fra login_api_service.php: get_login()
+•	HTML + CSS for skjema og layout, med enkel validering (required, autocomplete)
+•	Gjenbruk av felles komponenter via header.php og footer.php
+Html > register > profile_avatars
+Mappe der bilder blir lagt inn, bestående av png filer
+Html > register > index.php
+Dette er en registreringsside der brukeren kan velge å registrere seg som student eller foreleser, og får et skjema som tilpasser seg valget.
+•	Hvis brukeren allerede er innlogget, blir de sendt til forsiden.
+•	Brukeren velger rolle (student/foreleser) via radioknapper.
+•	Registreringsskjemaet viser ulike felter avhengig av rolle:
+o	Student: navn, e-post, passord + studieretning og studiekull
+o	Foreleser: navn, e-post, passord + emneinfo (emnenavn, emnekode, PIN), profilbilde og sikkerhetsspørsmål/svar
+•	Skjemaet sendes til en egen handler (/register/register.php) for videre behandling.
+Teknologi og struktur
+•	PHP for visningslogikk (rollevalg) og redirect ved innlogget bruker
+•	Sessions (session_start) for å sjekke om bruker er innlogget
+•	HTML + CSS for skjema og layout, med enkel validering (required, minlength, pattern, maxlength)
+•	Filopplasting med enctype="multipart/form-data" for profilbilde (foreleser)
+•	Gjenbruk av felles komponenter via header.php og footer.php
+Html > register > register.php
+•	Leser inn felter fra POST (navn, e-post, rolle og passord).
+•	Hvis rollen er student, registreres brukeren med studieretning og studiekull.
+•	Hvis rollen er foreleser, håndterer siden også opplasting av profilbilde og registrerer foreleser med emneinfo (emnekode, emnenavn, PIN) og sikkerhetsspørsmål/svar.
+•	Etter registrering blir brukeren sendt videre til innloggingssiden.
+Teknologi og struktur
+•	PHP for serverlogikk og behandling av skjemadata ($_POST)
+•	Funksjoner fra login_api_service.php:
+o	register_student()
+o	register_lecturer()
+•	Filopplasting via $_FILES for profilbilde:
+o	bygger filsti i egen mappe (profile_avatars/)
+o	sjekker at filen er et bilde, filtype (jpg/png/jpeg) og filstørrelse
+o	lagrer filen med move_uploaded_file()
+•	Redirect med header("Location: /login") etter fullført registrering
+Html > index.php
+Dette er hjemmesiden som viser en oversikt over emner hentet fra systemet.
+•	Henter innlogget bruker fra session og viser rollebasert informasjon (student/foreleser/gjest).
+•	Henter emneliste med get_courses() og viser emnene som klikkbare kort.
+•	Hvis bruker er innlogget, vises en enkel brukerprofil (navn, e-post, rolle) og lenke til endre passord.
+•	Hvert emne lenker videre til emnesiden med course_id og course_code i URL.
+Teknologi og struktur
+•	PHP for å hente data og styre visning basert på rolle
+•	Sessions (session_start) for innlogget brukerdata
+•	Service-/API-filer (course_api_service.php, login_api_service.php, api_client.php) for datatilgang
+•	HTML + CSS med semantiske elementer (main, header, section, nav, article, ul/li)
+•	Gjenbruk av felles header.php og footer.php
+Html > logout.php 
+Dette er en enkel side for utlogging av bruker.
+•	Tømmer all lagret session-data.
+•	Avslutter aktiv session.
+•	Sender brukeren tilbake til forsiden.
+Teknologi og struktur
+•	PHP for håndtering av session
+•	Bruk av session_start(), nullstilling av $_SESSION og session_destroy()
+•	Redirect med header('Location: /') etter utlogging
+Html > styles.css
+•	Reset og base-styling (margin/padding/box-sizing) og grunnstil for body.
+•	Styling av header med festet toppmeny, logo, navigasjon og innloggings-/utloggingsknapper.
+•	Responsivt design for mobil (tilpasser header/meny under < 640px).
+•	Layout for festet footer (footer alltid nederst).
+•	Styling for emneoversikt (emneliste som “kort” i grid).
+•	Styling for emneside med PIN-skjema, tilbake-lenke og feilmeldinger.
+•	Styling for meldinger/kommentarer 
+•	Styling for registreringsside (rollevalg, skjema, filopplasting, feil-/suksessmeldinger).
+Teknologi og struktur
+•	Ren CSS (ingen rammeverk) med:
+o	felles “base” + komponenter (header, knapper, kort, skjema)
+o	egne seksjoner kommentert etter side (emneoversikt, emneside, meldinger, registrering)
+•	Bruk av flexbox og CSS grid for layout
+•	Enkle hjelpeklasser som .visually-hidden for tilgjengelighet
+•	Media query for responsiv tilpasning (@media (max-width: 640px))
+Src > entities > course.php 
+Dette er en PHP-klasse som representerer et emne (Course) i systemet.
+Hva som er laget
+•	En klasse med faste egenskaper for et emne:
+o	course_id – unik ID for emnet
+o	lecturer_id – ID til foreleser som eier emnet
+o	course_code – emnekode
+o	pin_code – PIN-kode for tilgang
+Klassen fungerer som en datastruktur for å organisere og håndtere emnedata i applikasjonen.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av typede egenskaper (int, string)
+•	Modellklasse som kan brukes sammen med service-/API-lag for å representere data fra database eller API
+
+Src > entities > lecturer.php
+Dette er en PHP-klasse som representerer en foreleser, og som arver fra en generell User-klasse.
+Hva som er laget
+•	Klassen Lecturer arver grunnleggende brukeregenskaper fra User.
+•	I tillegg har den egne egenskaper:
+o	avatar – filsti til profilbilde
+o	security_question – sikkerhetsspørsmål
+o	security_answer – svar på sikkerhetsspørsmål
+Klassen brukes til å strukturere og håndtere data som er spesifikk for forelesere i systemet.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av arv (extends User) for å gjenbruke felles brukeregenskaper
+•	Typede egenskaper (string)
+•	Modellklasse som inngår i applikasjonens datalag
+Src > entities > student.php
+Dette er to PHP-klasser som representerer student-brukere i systemet, og som bygger videre på en generell User-klasse.
+Hva som er laget
+•	Student-klassen:
+o	Arver fra User
+o	Har egne egenskaper:
+	student_id
+	study_field (studieretning)
+	class_year (studiekull)
+o	Bruker en konstruktør som kaller parent::__construct() for å sette felles brukerdata, og deretter setter student-spesifikke felter.
+•	StudentNoId-klassen:
+o	Arver fra UserNoId
+o	Brukes i situasjoner der student-ID ikke er satt ennå (f.eks. før lagring i database)
+o	Inneholder studieretning og studiekull
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av arv (extends User / UserNoId) for å gjenbruke felles brukeregenskaper
+•	Bruk av konstruktør og parent-kall
+•	Typede egenskaper (int, string)
+•	Modellklasser som inngår i applikasjonens datalag og representerer student-objekter
+Src > entities > user.php
+Dette er en PHP-klasse som representerer en bruker i systemet. Klassen brukes som base for andre brukertyper, som student og foreleser.
+Hva som er laget
+•	Klassen inneholder felles egenskaper for alle brukere:
+o	id (privat)
+o	first_name
+o	last_name
+o	mail
+o	role
+o	password
+•	En konstruktør (__construct) setter alle verdiene når et nytt brukerobjekt opprettes.
+•	Klassen fungerer som en baseklasse for andre brukerklasser som arver disse egenskapene.
+Det finnes også en kommentert klasse (UserNoId) som er ment brukt i situasjoner der bruker-ID ikke er satt ennå (for eksempel før lagring i database).
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av:
+o	private og public egenskaper
+o	konstruktør
+o	arv (extends) i andre klasser
+•	Modellklasse som representerer brukerdata i applikasjonens datalag
+Src > models > base_message_reply.php
+Dette er et sett med PHP-klasser som brukes til å representere meldinger, kommentarer, svar og rapporter i systemet.
+Hva som er laget
+•	BaseMessageReplyType:
+o	Felles baseklasse med egenskaper:
+	message_id
+	created_at
+	text
+o	Brukes som grunnlag for andre meldingstyper.
+•	CommentDto:
+o	Arver fra baseklassen
+o	Har i tillegg comment_id
+o	Representerer en kommentar til en melding.
+•	ReplyDto:
+o	Arver fra baseklassen
+o	Har i tillegg reply_id
+o	Representerer et svar (typisk fra foreleser).
+•	ReportDto:
+o	Arver fra baseklassen
+o	Har i tillegg report_id
+o	Representerer en rapportering av en melding.
+Klassene fungerer som Data Transfer Objects (DTO-er) for strukturert håndtering av meldingsdata.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av arv (extends) for å samle felles egenskaper i en baseklasse
+•	Typede egenskaper (string)
+•	Modell-/DTO-lag som brukes til å strukturere data mellom API/service-lag og visningslag
+Src > models > course_tdo.php
+Dette er en PHP-klasse som representerer et emne (course) som et dataobjekt i systemet.
+Hva som er laget
+Klassen inneholder strukturerte egenskaper for et emne:
+•	course_id – unik ID for emnet
+•	lecturer_id – ID til foreleser som eier emnet
+•	course_name – navn på emnet
+•	course_code – emnekode
+•	pin_code – PIN-kode for tilgang
+Klassen fungerer som et DTO (Data Transfer Object) og brukes til å overføre emnedata mellom API/service-laget og visningslaget.
+Den kommenterte konstruktøren viser hvordan objektet kan initialiseres ved opprettelse.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av typede egenskaper (int, string)
+•	DTO-struktur for tydelig separasjon mellom:
+o	Datamodell
+o	Service-/API-lag
+o	Presentasjonslag
+Src > models > create_comment_dto.php
+Dette er en PHP-klasse som representerer data som brukes ved opprettelse av en kommentar i systemet.
+Hva som er laget
+Klassen inneholder feltene som trengs for å opprette en kommentar:
+•	message_id – ID til meldingen kommentaren tilhører
+•	created_at – tidspunkt for når kommentaren ble opprettet
+•	text – selve kommentarteksten
+Konstruktøren (__construct) setter verdiene når objektet opprettes.
+Klassen brukes til å strukturere og sende kommentardata mellom applikasjonens ulike lag (for eksempel fra presentasjonslag til service-/API-lag).
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av konstruktør
+•	Typede egenskaper (string)
+•	DTO-mønster for tydelig og strukturert dataoverføring
+Src > models > create_course_dto.php
+Dette er en PHP-klasse som brukes ved opprettelse av et nytt emne (course) i systemet.
+Hva som er laget
+Klassen inneholder feltene som trengs for å opprette et emne:
+•	course_code – emnekode
+•	course_name – navn på emnet
+•	pin_code – PIN-kode for tilgang
+Klassen fungerer som et DTO (Data Transfer Object) for å samle og strukturere data når et nytt emne skal opprettes.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Typede egenskaper (string, int)
+•	Bruk av DTO-mønster for å skille:
+o	Dataoverføring
+o	Forretningslogikk
+o	Presentasjonslag
+Src > models > create_lecturer_dto.php
+Dette er en PHP-klasse som brukes ved opprettelse av en ny foreleser, inkludert tilhørende emne.
+Hva som er laget
+•	Klassen arver fra CreateUserDto, og får dermed grunnleggende brukerfelter (navn, e-post, passord, rolle).
+•	I tillegg inneholder den:
+o	avatar – profilbilde
+o	security_question – sikkerhetsspørsmål
+o	security_answer – svar på sikkerhetsspørsmål
+o	course – et innebygd CreateCourseDto-objekt for å opprette emne samtidig
+Konstruktøren oppretter automatisk et nytt CreateCourseDto-objekt, slik at foreleser og emne kan registreres samlet.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av arv (extends CreateUserDto)
+•	Sammensetning (komposisjon) ved at klassen inneholder et annet DTO-objekt (CreateCourseDto)
+•	Typede egenskaper
+•	DTO-mønster for strukturert dataoverføring mellom registreringsskjema og service-/API-lag
+Src > models > create_message_dto.php
+Dette er en PHP-klasse som brukes ved opprettelse av en ny melding i et emne.
+Hva som er laget
+Klassen inneholder feltene som trengs for å registrere en melding:
+•	student_id – ID til studenten som sender meldingen
+•	course_id – ID til emnet meldingen tilhører
+•	created_at – tidspunkt for opprettelse (valgfri / kan settes senere)
+•	text – selve meldingsteksten
+Den kommenterte konstruktøren viser hvordan objektet kan initialiseres ved opprettelse.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Typede egenskaper (string, int, ?string)
+•	Bruk av nullable-type (?string) for fleksibel håndtering av tidspunkt
+•	DTO-mønster for strukturert dataoverføring mellom presentasjonslag og service-/API-lag
+Src > models > create_student_dto.php
+Dette er en PHP-klasse som brukes ved opprettelse av en ny student i systemet.
+Hva som er laget
+•	Klassen arver fra CreateUserDto, og får dermed grunnleggende brukerfelter (fornavn, etternavn, e-post, passord, rolle).
+•	I tillegg inneholder den student-spesifikke felter:
+o	study_field – studieretning
+o	class_year – studiekull
+Klassen brukes til å samle og strukturere data fra registreringsskjemaet før informasjonen sendes videre til service-/API-laget.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av arv (extends CreateUserDto) for gjenbruk av felles brukerfelter
+•	Typede egenskaper (string, int)
+•	DTO-mønster for tydelig separasjon mellom presentasjonslag og forretningslogikk
+Src > models > create_user_dto.php
+Dette er en PHP-klasse som brukes ved opprettelse av en ny bruker i systemet.
+Hva som er laget
+Klassen inneholder de grunnleggende feltene som trengs for å registrere en bruker:
+•	first_name – fornavn
+•	last_name – etternavn
+•	mail – e-postadresse
+•	role – brukertype (student eller foreleser)
+•	password – passord
+Klassen fungerer som en base for andre DTO-er, som CreateStudentDto og CreateLecturerDto.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Typede egenskaper (string)
+•	Brukes som grunnleggende DTO i registreringsprosessen
+•	Danner grunnlag for arv i andre opprettelsesklasser
+
+Src > models > message_dto.php
+Dette er en PHP-klasse som representerer en melding i et emne, inkludert tilhørende svar og kommentarer.
+Hva som er laget
+Klassen inneholder:
+•	message_id – unik ID for meldingen
+•	student_id – ID til studenten som sendte meldingen (kan være null)
+•	course_id – ID til emnet meldingen tilhører
+•	created_at – tidspunkt for opprettelse
+•	text – innholdet i meldingen
+•	replies – liste over svar (typisk fra foreleser)
+•	comments – liste over kommentarer til meldingen
+Klassen brukes til å samle all relevant informasjon om en melding i ett strukturert objekt.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Typede egenskaper (string, ?string, array)
+•	Bruk av nullable-type (?string) for fleksibel håndtering av avsender
+•	DTO-mønster for strukturert dataoverføring mellom API/service-lag og visningslag
+Src > models > user_dto.php
+Dette er et sett med PHP-klasser som representerer brukere og rolle-spesifikke data i systemet.
+Hva som er laget
+•	UserDto
+ Grunnleggende brukerobjekt med:
+o	user_id
+o	first_name
+o	last_name
+o	mail
+o	role
+o	password
+•	ExtendedUserDto
+ Arver fra UserDto og inneholder i tillegg:
+o	extended_data – enten StudentDataDto eller LecturerDataDto
+ (bruker union type for fleksibel håndtering av rolledata)
+•	StudentDto
+ Arver fra UserDto og inneholder:
+o	study_field
+o	class_year
+•	LecturerDto
+ Arver fra UserDto og inneholder:
+o	avatar
+•	StudentDataDto
+ Egen klasse for student-spesifikke data.
+•	LecturerDataDto
+ Egen klasse for foreleser-spesifikke data:
+o	avatar
+o	security_question
+o	security_answer
+Disse klassene brukes for strukturert håndtering av brukerdata i ulike deler av systemet.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av:
+o	arv (extends)
+o	union types (StudentDataDto|LecturerDataDto)
+o	typede egenskaper (string, int)
+•	DTO-mønster for å skille:
+o	Datamodell
+o	Service-/API-lag
+o	Presentasjonslag
+Src > models > user_login_dto.php
+Dette er en PHP-klasse som brukes ved innlogging av bruker i systemet.
+Hva som er laget
+Klassen inneholder de feltene som trengs for å håndtere innlogging:
+•	user_id – unik ID for brukeren
+•	mail – e-postadresse
+•	password – passord
+Klassen brukes til å strukturere innloggingsdata mellom presentasjonslag og service-/API-lag.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Typede egenskaper (string)
+•	DTO-mønster for tydelig separasjon mellom:
+o	Innloggingslogikk
+o	Datamodell
+o	Presentasjonslag
+Src > sql > init.sql
+Dette er SQL-skriptet som oppretter databasen og tabellene som brukes i Emneportalen.
+Hva som er laget
+Databasen består av følgende hovedtabeller:
+•	users
+ Lagrer alle brukere (student og foreleser) med felles felter som navn, e-post, rolle og passord.
+•	students
+ Inneholder student-spesifikke data (studieretning og studiekull).
+ Koblet til users via fremmednøkkel.
+•	lecturers
+ Inneholder foreleser-spesifikke data (profilbilde og sikkerhetsspørsmål).
+ Koblet til users via fremmednøkkel.
+•	courses
+ Lagrer emner med emnekode, emnenavn og PIN-kode.
+ Koblet til foreleser.
+•	students_courses
+ Koblingstabell mellom studenter og emner (mange-til-mange-relasjon).
+•	messages
+ Meldinger sendt av studenter til et emne.
+•	replies
+ Ett svar per melding (typisk fra foreleser).
+•	comments
+ Kommentarer knyttet til meldinger.
+•	reports
+ Rapportering av meldinger.
+Struktur og relasjoner
+•	Bruk av primærnøkler (PRIMARY KEY) og fremmednøkler (FOREIGN KEY).
+•	Bruk av ON DELETE CASCADE for å sikre at tilknyttede data slettes automatisk.
+•	Bruk av:
+o	AUTO_INCREMENT for ID-er
+o	ENUM for rolle (student/lecturer)
+o	DATETIME DEFAULT CURRENT_TIMESTAMP for automatisk tidsstempling
+o	Koblingstabell for mange-til-mange-forhold
+Src > sql > migrate1.sql
+Dette er en SQL-kommando som oppdaterer den eksisterende courses-tabellen.
+Hva som er gjort
+•	Det er lagt til en ny kolonne:
+o	course_name – navn på emnet
+•	Kolonnen er definert som:
+o	VARCHAR(50)
+o	NOT NULL (må ha verdi)
+Denne endringen gjør at hvert emne nå lagrer både emnekode og emnenavn.
+Teknologi og struktur
+•	SQL (MySQL/MariaDB)
+•	Bruk av ALTER TABLE for å endre eksisterende tabellstruktur
+•	Utvidelse av databaseskjema uten å slette eksisterende data
+Src > db.php
+Dette er en PHP-klasse som håndterer tilkobling til databasen.
+Hva som er laget
+•	Klassen oppretter en forbindelse til en MySQL-database ved hjelp av PDO.
+•	Inneholder private variabler for:
+o	Databasevert (localhost:3306)
+o	Databasenavn (datasikkerhet)
+o	Brukernavn (root)
+o	Passord (dev)
+•	I konstruktøren forsøkes det å opprette en tilkobling.
+•	Hvis tilkoblingen lykkes, settes connection_status til true.
+•	Hvis tilkoblingen feiler, settes connection_status til false.
+•	Metoden getDb() returnerer databaseforbindelsen slik at andre deler av systemet kan bruke den.
+Teknologi og struktur
+•	Objektorientert PHP (OOP)
+•	Bruk av PDO (PHP Data Objects) for databaseforbindelse
+•	Bruk av try/catch for håndtering av tilkoblingsfeil
+•	Encapsulation (private variabler og offentlig metode for tilgang)
+•	Fungerer som en sentral database-klasse som kan gjenbrukes i service-/API-lag
+Src > repository.php
+Dette er en “Repository”-klasse som fungerer som et samlet datalag for Emneportalen. Klassen kobler til databasen og inneholder metoder for å hente og lagre data for brukere, emner og meldinger.
+Hva som er laget
+•	Oppretter databaseforbindelse via Database-klassen og bruker PDO for spørringer.
+•	Brukerfunksjoner:
+o	Henter bruker via e-post eller ID
+o	Henter innloggingsinfo (e-post/passord)
+o	Henter sikkerhetsspørsmål/-svar for foreleser
+o	Oppretter student eller foreleser (inkl. bruker i users-tabellen)
+o	Oppdaterer passord
+o	Henter student-/foreleserdata (rolle-spesifikke felter)
+•	Emnefunksjoner:
+o	Henter alle emner eller emner knyttet til student
+o	Henter emne og PIN-kode
+o	Oppretter emne (typisk ved foreleser-registrering)
+o	Kobler student til emne (mange-til-mange)
+•	Meldingssystem:
+o	Henter og oppretter meldinger
+o	Henter og oppretter svar (replies)
+o	Henter og oppretter kommentarer
+o	Oppretter rapporter
+•	Inneholder en intern funksjon som genererer UUID for nye brukere.
+Teknologi og struktur
+•	PHP (OOP): én klasse som samler databaseoperasjoner
+•	PDO med prepare() og execute() for databasekall
+•	Bruk av DTO/modellklasser (UserDto, CourseDto, MessageDto, osv.) med fetchObject() / FETCH_CLASS
+•	Transaksjoner (beginTransaction, commit, rollBack) for sikre opprettelser og oppdateringer
+•	Strukturert oppdeling i seksjoner: Users, Courses, Messages, Replies, Comments, Reports
+•	Repository-mønster: presentasjons-/service-laget kaller repository-metoder i stedet for å skrive SQL direkte
+
+
+
+
+
+
+
+Backend-støtte for Frontend
+Denne delen av prosjektet består av PHP-filer som kobler frontend til backend-API-et. Filene fungerer som et mellomledd mellom brukergrensesnittet og API-endepunktene.
+ 
+Oversikt over filer
+config.php:
+Inneholder grunnleggende konfigurasjon for prosjektet. Definerer API-porten (8001) og base-URL for alle API-kall. Denne filen gjør det enkelt å endre API-adressen på ett sted.
+api_client.php:
+Håndterer all kommunikasjon med backend-API-et. Bruker CURL for å sende HTTP-forespørsler (GET, POST) til localhost:8001/api og returnerer JSON-svar. Denne filen er bindeleddet mellom frontend og backend. 
+login_api_service.php:
+Inneholder funksjoner for brukerautentisering og registrering:
+-	get_login() — logger inn brukere (studenter og forelesere)
+-	register_student() — registrerer nye studenter
+-	register_lecturer() — registrerer nye forelesere med emne og PIN-kode
+-	change_password() — bytter passord for innlogget bruker
+-	get_security_question() — henter sikkerhetsspørsmål ved glemt passord
+-	forgot_password() — tilbakestiller passord via sikkerhetsspørsmål
+
+course_api_service.php:
+Håndterer all emne- og meldingsrelatert funksjonalitet:
+-	get_course() — henter et spesifikt emne med meldinger (støtter PIN-kode for gjester)
+-	get_courses() — henter alle emner
+-	create_message() — oppretter ny melding fra student
+-	create_reply() — oppretter svar fra foreleser
+-	create_comment() — legger til kommentar fra gjest
+-	create_report() — rapporterer upassende melding
+
+header.php:
+Gjenbrukbar header-komponent som vises øverst på alle sider. Viser innlogget brukers navn og rolle (student/foreleser), eller en innloggingsknapp for gjester. Bruker $_SESSION['session_data'] for å sjekke om noen er logget inn.
+footer.php:
+Gjenbrukbar footer-komponent med kontaktinformasjon.
+compose.yaml:
+Docker-konfigurasjon for å kjøre MySQL-database lokalt under utvikling. 
+ 
+Hvordan frontend bruker backend
+1.	Konfigurasjon: config.php definerer hvor API-en ligger
+2.	API-kommunikasjon: api_client.php sender alle HTTP-forespørsler til backend
+3.	Service-lag: login_api_service.php og course_api_service.php pakker inn API-kall i enkle funksjoner
+4.	Frontend: HTML-sider kaller service-funksjonene i stedet for å snakke direkte med API-et
+ 
+Teknologier brukt
+-	PHP  Serverside-logikk
+-	CURL  HTTP-forespørsler til API
+-	Sessions  Brukerautentisering (lagrer session_data)
+-	JSON  Dataformat mellom frontend og API
+-	Docker + MySQL  Database (under utvikling)
+
+
+
+
