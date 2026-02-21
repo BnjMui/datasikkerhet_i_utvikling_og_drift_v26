@@ -1,16 +1,36 @@
 name: db_datasikkerhet
 
 services:
+  web:
+    container_name: datasikkerhet_web
+    image: datasikkerhet/web
+    build:
+      dockerfile: ./docker/web.Dockerfile
+    volumes:
+      - .:/var/www/
+    ports:
+      - 8080:80
   db:
-    image: mysql
-    container_name: mysql_db
+    container_name: datasikkerhet_db
+    image: datasikkerhet/db
+    build: 
+      dockerfile: ./docker/db.Dockerfile
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: datasikkerhet
       MYSQL_ROOT_PASSWORD: dev
     volumes:
       - datasikkerhet_db:/var/lib/mysql
+
+  my-admin:
+    container_name: datasikkerhet_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8081:80
+    environment:
+      MYSQL_USERNAME: root
+      MYSQL_ROOT_PASSWORD: dev
+      
 
 volumes:
   datasikkerhet_db:
