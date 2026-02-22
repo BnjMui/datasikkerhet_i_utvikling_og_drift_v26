@@ -18,6 +18,7 @@ if (!$_SESSION["session_data"]) {
     }
 }
 if ($_SESSION["session_data"]["role"] == "student") {
+    var_dump([$course_id, $text]);
     create_message($course_id, $text);
 }
 if ($_SESSION["session_data"]["role"] == "lecturer") {

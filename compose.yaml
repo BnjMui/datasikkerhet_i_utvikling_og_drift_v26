@@ -8,6 +8,8 @@ services:
       dockerfile: ./docker/web.Dockerfile
     volumes:
       - .:/var/www/
+      - ./server_config/php/conf.d/conf.ini:/usr/local/etc/php/conf.d/conf.ini
+      - ./server_config/apache2/conf-enabled/server.conf:/etc/apache2/conf-enabled/server.conf
     ports:
       - 8080:80
   db:
