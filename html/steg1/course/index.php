@@ -186,7 +186,7 @@ if ($course) {
                                 }
                             endif ?>
                         </article>
-                        <?php if ($message["comments"]): ?>
+                        <?php if ($message["comments"]) ?>
                             <h4>Comments</h4>
                         <?php foreach ($message["comments"] as $comment) { ?>
                             <article>
@@ -196,9 +196,8 @@ if ($course) {
                             <p>
                             <?php echo $comment["created_at"]; ?>
                             </p>
-                            </article>
-                            <?php } endif ?>
                         </article>
+                        <?php } ?>
                     </li>
                     <?php } ?>
                     </ul>

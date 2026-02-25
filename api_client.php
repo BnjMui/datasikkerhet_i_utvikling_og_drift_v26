@@ -6,7 +6,7 @@ function api_request(string $method, string $url, array $data = [], array $heade
         return ['ok' => false, 'error' => 'cURL not available'];
     }
 
-    $base_api_url = "web/steg1/api";
+    $base_api_url = "http://localhost:8001/steg1/api";
 
     $ch = curl_init();
     $method = strtoupper($method);
@@ -19,8 +19,6 @@ function api_request(string $method, string $url, array $data = [], array $heade
 
     // Konfigurer cURL-alternativer
     curl_setopt($ch, CURLOPT_URL, $base_api_url . $url);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,true);
-    curl_setopt($ch, CURLOPT_POSTREDIR ,true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);

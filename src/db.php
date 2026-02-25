@@ -2,8 +2,8 @@
 class Database
 {
     # Fremtidig så skal verdiene her settes når objektet initsialiseres..
-    private PDO $db;
-    private string $_db_host = "db";
+    private Pdo\Mysql $db;
+    private string $_db_host = "localhost:3306";
     private string $_db_name = "datasikkerhet";
     private string $_db_user = "root";
     private string $_db_passwd = "dev";
@@ -13,15 +13,14 @@ class Database
     public function __construct(string $host, string $db_name, string $db_user, string $db_password)
     {
         try {
-            $this->db = new PDO("mysql:host=$this->_db_host;dbname=$this->_db_name", $this->_db_user, $this->_db_passwd);
+            $this->db = new Pdo\Mysql("mysql:host=$this->_db_host;dbname=$this->_db_name", $this->_db_user, $this->_db_passwd);
             $this->connection_status = true;
         } catch (PDOException $e) {
             $this->connection_status = false;
-            throw($e);
         }
     }
 
-    public function getDb(): PDO
+    public function getDb(): Pdo\Mysql
     {
         return $this->db;
     }

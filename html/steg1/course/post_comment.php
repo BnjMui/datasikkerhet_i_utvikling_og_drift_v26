@@ -21,6 +21,7 @@ if ($_SESSION["session_data"]["role"] == "student") {
     create_message($course_id, $text);
 }
 if ($_SESSION["session_data"]["role"] == "lecturer") {
+    echo print_r([$message_id, $text]);
     create_reply($message_id, $text);
 }
 
