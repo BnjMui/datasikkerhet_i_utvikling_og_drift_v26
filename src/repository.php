@@ -17,7 +17,7 @@ require_once "models/user_dto.php";
 class Repository
 {
     private Database $db;
-    private Pdo\Mysql $dbh;
+    private PDO $dbh;
 
     public function __construct()
     {

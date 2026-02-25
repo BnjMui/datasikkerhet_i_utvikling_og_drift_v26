@@ -21,7 +21,7 @@ function get_course($course_id, $pin_code = null)
     $response = api_request("GET", "/courses?course_id=$course_id", [], ["AUTHENTICATION: $auth_token"]);
 
     $message_data = api_request("GET", "/messages?course_id=$course_id", [], ["AUTHENTICATION: $auth_token"]);
-    $data = ["lecturer" => $response["data"]["lecturer"], "course" => $response["data"]["course"], "messages" => $message_data];
+    $data = ["lecturer" => $response["data"]["lecturer"], "course" => $response["data"]["course"], "messages" => $message_data["data"]];
 
     if ($response["success"]) {
         return $data;

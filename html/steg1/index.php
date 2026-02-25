@@ -8,6 +8,7 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/../api_client.php';
 // Hent brukerinfo fra session
 $user = isset($_SESSION['session_data']) ? $_SESSION['session_data'] : null;
 $role = $user["role"];
+$student_courses = [];
 
 $courses = get_courses();
 if ($user["role"] == "student") {
@@ -113,6 +114,7 @@ if ($user["role"] == "student") {
                         <?php foreach ($courses as $course):
 
                             ?>
+                        <?php if (!in_array($course["course_id"], array_column($student_courses, "course_id"))): ?>
                         <li>
                             <article class="emne-kort">
                                 <a href=
@@ -129,20 +131,13 @@ if ($user["role"] == "student") {
                                 </header>
                                 <p class="emne-navn"><?php echo htmlspecialchars($course['course_name']); ?></p>
                                         <?php
-                                        if ($user["role"] == "student" && $student_courses) {
-
-                                            if (in_array($course["course_id"], array_column($student_courses, "course_id"))) {
-                                                echo "<p>Du er registrert som student i dette emnet</p>";
-                                            
-                                            } else {
-                                            ?>
+                                    if ($user["role"] == "student") { ?>
                                     <form method="POST" action="/steg1/register_course.php">
                                         <input type="hidden" name="course_id" value="<?php echo $course["course_id"]; ?>" />
                                             <input type="submit" value="Registrer"/>
                                         </form>
                                     <?php
-                                            }
-                                        }
+                                    }
                             ?>
                                     <p> 
                                         <?php
@@ -154,7 +149,9 @@ if ($user["role"] == "student") {
                                 </a>
                             </article>
                         </li>
-                        <?php endforeach; ?>
+
+                        <?php endif;
+                        endforeach; ?>
 
                     </ul>
                 </nav>

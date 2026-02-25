@@ -15,7 +15,7 @@ if ($method === "GET") {
         if (!isset($data["pin_code"])) {
             $authenticated = require_auth();
         }
-        if ($data["pin_code"]) {
+        if (isset($data["pin_code"])) {
             $course_pin = repository()->getCoursePin($data["course_id"]);
             if ($data["pin_code"] != $course_pin) {
                 send_error("Unauthorized", 401);
