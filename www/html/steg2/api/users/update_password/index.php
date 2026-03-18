@@ -16,13 +16,6 @@ $data   = get_request_data();
 if ($method === 'POST') {
     validate_required($data, ["new_password"]);
 
-    $authenticated = require_auth();
-
-    if (!$authenticated["authenticated"]) {
-        send_error("Unauthorized", 401);
-        exit;
-    }
-
     $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
 
     $success = repository()->updatePasswordByUserId($_SESSION['user_id'], $hashed_password);

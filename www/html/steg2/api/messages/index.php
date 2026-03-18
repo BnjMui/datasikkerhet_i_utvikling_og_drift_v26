@@ -1,17 +1,19 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authorization.php';
 
 $method = get_method();
 $data = get_request_data();
+$auth = new Authorization();
 
 if ($method === "GET") {
     if (isset($data["pin_code"])) {
-    $pin_code = $data["pin_code"];
+        $pin_code = $data["pin_code"];
     }
 
     if (!isset($pin_code)) {
-        $authenticated = require_auth();
+        $authenticated = $auth->require_auth();
     }
 
     if (isset($pin_code)) {
@@ -38,12 +40,12 @@ if ($method === "GET") {
 
 if ($method === "POST") {
     validate_required($data, ["course_id", "text"]);
-    $authenticated = require_auth();
+    $authenticated = $auth->require_auth();
 
     if (!$authenticated["authenticated"] || $authenticated["role"] != "student") {
         send_error("Unauthorized", 401);
     }
-    # TODO Sjekk om student har kurset...
+
     $student_courses = repository()->getStudentCourses($authenticated["user_id"]);
     $student_has_course = false;
     foreach ($student_courses as $course) {

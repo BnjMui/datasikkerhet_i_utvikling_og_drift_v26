@@ -1,9 +1,11 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authorization.php';
 
 $method = get_method();
 $data = get_request_data();
+$auth = new Authorization();
 
 if ($method === "GET") {
     # Get Courses
@@ -13,7 +15,7 @@ if ($method === "GET") {
 
     if (isset($data["course_id"])) {
         if (!isset($data["pin_code"])) {
-            $authenticated = require_auth();
+            $authenticated = $auth->require_auth();
         }
         if (isset($data["pin_code"])) {
             $course_pin = repository()->getCoursePin($data["course_id"]);
@@ -31,7 +33,7 @@ if ($method === "GET") {
         ];
     }
 
-    if (isset($data["student_id"]) && $data["student_id"] == require_auth()["user_id"]) {
+    if (isset($data["student_id"]) && $data["student_id"] == $auth->require_auth()["user_id"]) {
         $result = repository()->getStudentCourses($data["student_id"]);
     }
 
@@ -40,12 +42,10 @@ if ($method === "GET") {
     }
 }
 
-
-
 if ($method === "POST") {
     validate_required($data, ["student_id", "course_id"]);
 
-    $authenticated = require_auth();
+    $authenticated = $auth->require_auth();
 
     if (!$authenticated["authenticated"] || $authenticated["role"] != "student") {
         send_error("Unauthorized", 401);

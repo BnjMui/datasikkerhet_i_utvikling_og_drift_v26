@@ -1,27 +1,24 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authorization.php';
 
 $method = get_method();
 $data = get_request_data();
+$auth = new Authorization();
 
- if ($method === "GET")
- {
- }
+if ($method === "GET") {
+}
 
 if ($method === "POST") {
     validate_required($data, ["message_id", "text"]);
-    // Autentiser som student
-    // Hvis ikke autentisert retuner 401
-    // Hvis autentisert lagre melding i database
-    // Autentiser som student
-    // Hvis ikke autentisert retuner 401
-    $authenticated = require_auth();
+
+    $authenticated = $auth->require_auth();
 
     if (!$authenticated["authenticated"] || $authenticated["role"] != "lecturer") {
         send_error("Unauthorized", 401);
     }
-    // Hvis autentisert lagre melding i database
+
     $reply = new BaseMessageReplyType();
 
     $reply->message_id = $data["message_id"];
