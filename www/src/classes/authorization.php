@@ -4,8 +4,8 @@ class Authorization {
 
     // Sjekker om brukeren er innlogget
     public function isLoggedIn(): bool {
-        return isset($_SESSION['user_id']);
-    }
+    return isset($_SESSION['session_data']['user_id']);
+}
 
     // Gammel autentisering via HTTP header
     public function require_auth() {

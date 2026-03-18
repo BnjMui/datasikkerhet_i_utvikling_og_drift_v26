@@ -1,24 +1,24 @@
 <?php
 
 require_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authentication.php';
 require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authorization.php';
 
-$auth = new Authorization();
+$method = get_method();
+$data = get_request_data();
+$repository = new Repository();
+$auth = new Authentication($repository);
+$authz = new Authorization();
 
-if (!$auth->isLoggedIn()) {
+if (!$authz->isLoggedIn()) {
     send_error("Unauthorized", 401);
     exit;
 }
 
-$method = get_method();
-$data   = get_request_data();
-
 if ($method === 'POST') {
     validate_required($data, ["new_password"]);
 
-    $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
-
-    $success = repository()->updatePasswordByUserId($_SESSION['user_id'], $hashed_password);
+    $result = $auth->changePassword($data["new_password"]);
 
     send_success(null, "Password updated", 204);
 }
