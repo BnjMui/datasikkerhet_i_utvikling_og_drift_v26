@@ -33,7 +33,7 @@ class Authentication {
     }
 
     // Registrere ny bruker - logikk hentet fra register/index.php
-public function register(array $data): array {
+ public function register(array $data): array {
     if (!filter_var($data['mail'], FILTER_VALIDATE_EMAIL)) {
         return ['success' => false, 'message' => 'Invalid email'];
     }
@@ -81,7 +81,7 @@ public function register(array $data): array {
     public function forgotPassword(string $mail, string $security_answer, string $new_password): array {
         $security_data = $this->repository->getSecurityAnswerByMail($mail);
 
-        if (!password_verify($security_answer, $security_data["security_answer"])) {
+        if (!$security_data || !password_verify($security_answer, $security_data["security_answer"])) {
             return ['success' => false, 'message' => 'Answer is not correct'];
         }
 
