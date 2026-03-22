@@ -2,9 +2,9 @@
 
 // api/helpers.php
 // Felles hjelpefunksjoner for alle API-endepunkter
-session_start();
-
 require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/repository.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/models/user_login_dto.php";
+session_start();
 
 header('Content-Type: application/json');
 # header('Access-Control-Allow-Origin: http://158.39.188.223');

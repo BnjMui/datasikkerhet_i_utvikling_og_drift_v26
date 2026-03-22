@@ -1,10 +1,13 @@
 <?php
 
+require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/repository.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/models/user_login_dto.php";
+
 class Authorization {
 
     // Sjekker om brukeren er innlogget
     public function isLoggedIn(): bool {
-    return isset($_SESSION['session_data']['user_id']);
+    return isset($_SESSION['session_data']->user_id);
 }
 
     // Gammel autentisering via HTTP header

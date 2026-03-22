@@ -1,7 +1,7 @@
 <?php
 
 require_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/api/helpers.php';
-require_once $_SERVER["DOCUMENT_ROOT"] . '/src/classes/Authorization.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/../src/classes/Authorization.php';
 
 $method = get_method();
 $data = get_request_data();
