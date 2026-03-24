@@ -1,9 +1,11 @@
 <?php
 
-// api/helpers.php
-// Felles hjelpefunksjoner for alle API-endepunkter
 require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/repository.php";
 require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/models/user_login_dto.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/../src/classes/InputValidation.php";
+
+// api/helpers.php
+// Felles hjelpefunksjoner for alle API-endepunkter
 session_start();
 
 header('Content-Type: application/json');
@@ -70,7 +72,8 @@ function get_request_data()
 
 function validate_required($data, $fields)
 {
-    $missing = array_filter($fields, fn ($f) => empty(trim($data[$f] ?? '')));
+    $validator = new InputValidation();
+    $missing = $validator->validateRequired($data, $fields);
     if ($missing) {
         send_error('Manglende felter: ' . implode(', ', $missing), 400);
         exit;
