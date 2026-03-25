@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "DatasikkerhetG7\\": "src/"
+        }
+    },
+    "require": {
+        "monolog/monolog": "^3.10"
+    }
+}
