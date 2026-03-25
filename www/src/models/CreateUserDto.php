@@ -1,4 +1,6 @@
 <?php
+namespace DatasikkerhetG7\Models;
+
 class CreateUserDto
 {
     public string $first_name;
@@ -6,4 +8,5 @@ class CreateUserDto
     public string $mail;
     public string $role;
     public string $password;
+    public array $security_questions;
 }

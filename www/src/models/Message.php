@@ -1,6 +1,7 @@
 <?php
+namespace DatasikkerhetG7\Models;
 
-class MessageDto
+class Message
 {
     public string $message_id;
     public ?string $student_id;

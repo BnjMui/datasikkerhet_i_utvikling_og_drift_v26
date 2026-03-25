@@ -1,6 +1,7 @@
 <?php
+namespace DatasikkerhetG7\Models;
 
-class UserLoginDto
+class UserLogin
 {
     public string $user_id;
     public string $mail;
