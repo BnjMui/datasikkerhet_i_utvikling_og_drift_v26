@@ -1,5 +1,6 @@
 <?php
-require_once "create_user_dto.php";
+namespace DatasikkerhetG7\Models;
+
 class CreateStudentDto extends CreateUserDto
 {
     public string $study_field;

@@ -1,4 +1,6 @@
 <?php
+namespace DatasikkerhetG7\Models;
+
 class CreateCourseDto
 {
     public string $course_code;
