@@ -32,7 +32,8 @@ class Repository
 
     public function __construct()
     {
-        $this->db = new Database("localhost", "datasikkerhet", "root", "dev");
+        ## Bytte til "steg2_datasikkerhet"?
+        $this->db = new Database("db", "steg2_datasikkerhet", "root", "dev");
         $this->dbh = $this->db->getDb();
     }
 
