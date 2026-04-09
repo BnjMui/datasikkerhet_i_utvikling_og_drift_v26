@@ -68,6 +68,9 @@ class Repository
         return $result;
     }
 
+    #############
+    #Create this#
+    #############
     public function createSecurityQuestion(CreateSecurityQuestion $security_question): bool
     {
         return false;
@@ -127,12 +130,28 @@ class Repository
             VALUES (?, ?, ?)"
         );
 
+        $security_question_statement = $this->dbh->prepare(
+            "INSERT INTO xxx
+                ()
+            VALUES (?, ?, ?)"
+        );
+
         try {
             $uid = $this->uuid();
             $this->dbh->beginTransaction();
 
             $this->createUser($uid, $userData);
             $statement->execute([$uid, $userData->study_field, $userData->class_year]);
+
+            ####### TO REVIEW!!!
+            foreach ($userData->security_questions as $security_question_without_uid) {
+                $security_question = new CreateSecurityQuestion();
+                $security_question->user_id = $uid;
+                $security_question->security_question = $security_question_without_uid["security_question"];
+                $security_question->security_answer = $security_question_without_uid["security_answer"];
+
+                $this->createSecurityQuestion($security_question);
+            }
 
             return $this->dbh->commit();
         } catch (PDOException $e) {
@@ -271,7 +290,6 @@ class Repository
 
     public function createCourse(string $lecturer_id, CreateCourseDto $courseData): bool
     {
-        // TODO legg til createCourse objekt som property i CreateLecturerDto objektet
         $statement = $this->dbh->prepare(
             "INSERT INTO courses
                 (lecturer_id, course_code, course_name, pin_code)
