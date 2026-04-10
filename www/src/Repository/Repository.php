@@ -21,6 +21,7 @@ use DatasikkerhetG7\Models\Report;
 use DatasikkerhetG7\Models\Student;
 use DatasikkerhetG7\Models\User;
 use DatasikkerhetG7\Models\UserLogin;
+use DatasikkerhetG7\Models\UserSecurityAnswer;
 use DatasikkerhetG7\Models\UserSecurityQuestion;
 use PDO;
 use PDOException;
@@ -32,7 +33,6 @@ class Repository
 
     public function __construct()
     {
-        ## Bytte til "steg2_datasikkerhet"?
         $this->db = new Database("db", "steg2_datasikkerhet", "root", "dev");
         $this->dbh = $this->db->getDb();
     }
@@ -68,45 +68,49 @@ class Repository
         return $result;
     }
 
-    #############
-    #Create this#
-    #############
     public function createSecurityQuestion(CreateSecurityQuestion $security_question): bool
     {
-        return false;
+        $security_question_uid = $this->uuid();
+
+        $statement = $this->dbh->prepare(
+            "INSERT INTO security_questions
+                (question_id, user_id, security_question, security_answer)
+            VALUES (?, ?, ?, ?)"
+        );
+
+        return $statement->execute([$security_question_uid, $security_question->user_id, $security_question->security_question, $security_question->security_answer]);
+    }
+
+    /*
+    * @return list<UserSecurityQuestion>
+    */
+    public function getSecurityQuestionsByMail(string $mail): array
+    {
+        $statement = $this->dbh->prepare("
+            SELECT security_question FROM security_questions sq, users u
+            WHERE sq.user_id = u.user_id AND u.mail = ?
+            ");
+
+        $statement->execute([$mail]);
+
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, UserSecurityQuestion::class);
+
+        return $result;
     }
 
     #############
     #CHANGE THIS#
     #############
-    public function getSecurityQuestionByMail(string $mail): UserSecurityQuestion
+    public function getSecurityAnswersByMail(string $mail): mixed
     {
         $statement = $this->dbh->prepare("
-            SELECT security_question FROM lecturers l, users u
-            WHERE l.lecturer_id = u.user_id AND u.mail = ?
+            SELECT u.mail, u.user_id, sq.security_question, sq.security_answer FROM security_questions sq, users u
+            WHERE sq.user_id = u.user_id AND u.mail = ?
             ");
 
         $statement->execute([$mail]);
 
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-
-        return $result["security_question"];
-
-    }
-
-    #############
-    #CHANGE THIS#
-    #############
-    public function getSecurityAnswerByMail(string $mail): mixed
-    {
-        $statement = $this->dbh->prepare("
-            SELECT user_id, mail, security_question, security_answer FROM lecturers l, users u
-            WHERE l.lecturer_id = u.user_id AND u.mail = ?
-            ");
-
-        $statement->execute([$mail]);
-
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_CLASS, UserSecurityAnswer::class);
 
         return $result;
     }
@@ -119,6 +123,17 @@ class Repository
             VALUES (?, ?, ?, ?, ?, ?)"
         );
 
+        ####### TO REVIEW!!!
+        foreach ($userData->security_questions as $security_question_without_uid) {
+            $security_question = new CreateSecurityQuestion();
+            $security_question->user_id = $uid;
+            $security_question->security_question = $security_question_without_uid["security_question"];
+            $security_question->security_answer = $security_question_without_uid["security_answer"];
+
+            $this->createSecurityQuestion($security_question);
+        }
+
+
         return $statement->execute([$uid, $userData->first_name, $userData->last_name, $userData->mail, $userData->role, $userData->password]);
     }
 
@@ -130,11 +145,6 @@ class Repository
             VALUES (?, ?, ?)"
         );
 
-        $security_question_statement = $this->dbh->prepare(
-            "INSERT INTO xxx
-                ()
-            VALUES (?, ?, ?)"
-        );
 
         try {
             $uid = $this->uuid();
@@ -142,16 +152,6 @@ class Repository
 
             $this->createUser($uid, $userData);
             $statement->execute([$uid, $userData->study_field, $userData->class_year]);
-
-            ####### TO REVIEW!!!
-            foreach ($userData->security_questions as $security_question_without_uid) {
-                $security_question = new CreateSecurityQuestion();
-                $security_question->user_id = $uid;
-                $security_question->security_question = $security_question_without_uid["security_question"];
-                $security_question->security_answer = $security_question_without_uid["security_answer"];
-
-                $this->createSecurityQuestion($security_question);
-            }
 
             return $this->dbh->commit();
         } catch (PDOException $e) {
