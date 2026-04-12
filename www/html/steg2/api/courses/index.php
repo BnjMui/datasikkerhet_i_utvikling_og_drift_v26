@@ -1,8 +1,7 @@
 <?php
-#require_once $_SERVER["DOCUMENT_ROOT"] . "steg2/api/bootstrap.php";
-#require __DIR__ . "/../../../../vendor/autoload.php";
-require __DIR__ . "/../helpers.php";
-#use DatasikkerhetG7\Api\Helpers\Helpers;
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+require __DIR__ . "/../../../../vendor/autoload.php";
+use DatasikkerhetG7\Api\Helpers;
 
 
 $method = Helpers::get_method();

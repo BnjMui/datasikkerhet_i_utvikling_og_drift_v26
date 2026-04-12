@@ -1,6 +1,6 @@
 <?php
 
-namespace DatasikkerhetG7\Api\Helpers;
+namespace DatasikkerhetG7\Api;
 
 require __DIR__ . "/../../vendor/autoload.php";
 use DatasikkerhetG7\Repository\Repository;
@@ -43,7 +43,7 @@ class Helpers
         if ($data) {
             $response['data']    = $data;
         }
-        send_response($response, $code);
+        self::send_response($response, $code);
     }
 
     public static function send_error(string $message = "Bad Request", int $code = 400, string $details = ""): void
@@ -51,7 +51,7 @@ class Helpers
         if ($details) {
             error_log("API Error [$code]: $details");
         }
-        send_response(['success' => false, 'error' => $message], $code);
+        self::send_response(['success' => false, 'error' => $message], $code);
     }
 
     // ---------- INPUT ----------
@@ -70,11 +70,11 @@ class Helpers
         );
     }
 
-    public static function validate_required(mixed $data, mixed $fields): void
+    public static function validate_required(mixed $data, mixed $fields): mixed
     {
         $missing = array_filter($fields, fn ($f) => empty(trim($data[$f] ?? '')));
         if ($missing) {
-            send_error('Manglende felter: ' . implode(', ', $missing), 400);
+            self::send_error('Manglende felter: ' . implode(', ', $missing), 400);
             exit;
         }
     }
@@ -84,7 +84,7 @@ class Helpers
     public static function require_auth(): mixed
     {
         if (!isset($_SERVER["HTTP_AUTHENTICATION"])) {
-            send_error("Unauthorized", 401);
+            self::send_error("Unauthorized", 401);
             exit;
         }
 

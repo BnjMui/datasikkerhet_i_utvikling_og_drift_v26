@@ -1,9 +1,12 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Models\Report;
 
-$method = get_method();
-$data = get_request_data();
+$method = Helpers::get_method();
+$data = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 # if ($method === "GET")
 # {
@@ -15,18 +18,18 @@ $data = get_request_data();
 
 if ($method === "POST")
 {
-    validate_required($data, ["message_id", "text"]);
+    Helpers::validate_required($data, ["message_id", "text"]);
 
-    $report = new BaseMessageReplyType();
+    $report = new Report();
 
     $report->message_id = $data["message_id"];
     $report->text = $data["text"];
 
-    $result = repository()->createReport($report);
+    $result = $repository->createReport($report);
 
     if ($result) {
-        send_success(null, "Success", 204);
+        Helpers::send_success(null, "Success", 204);
     }
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

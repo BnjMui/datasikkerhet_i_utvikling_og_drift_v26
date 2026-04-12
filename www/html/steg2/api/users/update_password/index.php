@@ -1,25 +1,26 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
 
-$method = get_method();
-$data   = get_request_data();
+$method = Helpers::get_method();
+$data   = Helpers::get_request_data();
 
 if ($method === 'POST') {
-    validate_required($data, ["new_password"]);
+    Helpers::validate_required($data, ["new_password"]);
 
-    $authenticated = require_auth();
+    $authenticated = Helpers::require_auth();
 
     if (!$authenticated["authenticated"]) {
-        send_error("Unauthorized", 401);
+        Helpers::send_error("Unauthorized", 401);
         exit;
     }
 
     $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
 
-    $success = repository()->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
+    $success = Helpers::repository()->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
 
-    send_success(null, "Password updated", 204);
+    Helpers::send_success(null, "Password updated", 204);
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

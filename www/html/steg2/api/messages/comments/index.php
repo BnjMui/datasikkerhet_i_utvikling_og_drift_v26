@@ -1,9 +1,12 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Models\CreateBaseMessageReply;
 
-$method = get_method();
-$data = get_request_data();
+$method = Helpers::get_method();
+$data = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 # if ($method === "GET")
 # {
@@ -14,25 +17,25 @@ $data = get_request_data();
 # }
 
 if ($method === "POST") {
-    validate_required($data, ["pin_code", "course_id", "message_id", "text"]);
+    Helpers::validate_required($data, ["pin_code", "course_id", "message_id", "text"]);
 
     $pin_code = $data["pin_code"];
-    $course_pin = repository()->getCoursePin($data["course_id"]);
+    $course_pin = $repository->getCoursePin($data["course_id"]);
 
     if ($pin_code != $course_pin) {
-        send_error("Unauthorized", 401);
+        Helpers::send_error("Unauthorized", 401);
     }
 
-    $comment = new BaseMessageReplyType();
+    $comment = new CreateBaseMessageReply();
 
     $comment->message_id = $data["message_id"];
     $comment->text = $data["text"];
 
-    $result = repository()->createComment($comment);
+    $result = $repository->createComment($comment);
 
     if ($result) {
-        send_success(null, "Success", 204);
+        Helpers::send_success(null, "Success", 204);
     }
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

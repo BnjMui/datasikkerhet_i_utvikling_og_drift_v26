@@ -1,27 +1,30 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Models\CreateLecturerDto;
+use DatasikkerhetG7\Models\CreateStudentDto;
 
-$method = get_method();
-$data = get_request_data();
-$repository = new Repository();
+$method = Helpers::get_method();
+$data = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 if ($method === 'POST') {
 
     if ($data["role"] == "student") {
-        $valid = validate_required($data, ['first_name', 'last_name', 'mail', 'password', "role", 'study_field', 'class_year']);
+        $valid = Helpers::validate_required($data, ['first_name', 'last_name', 'mail', 'password', "role", "security_questions", 'study_field', 'class_year']);
     }
 
     if ($data["role"] == "lecturer") {
-        $valid = validate_required($data, ["first_name", "last_name", "mail", "password", "role", "avatar", "security_question", "security_answer", "course_code", "course_name", "pin_code"]);
+        $valid = Helpers::validate_required($data, ["first_name", "last_name", "mail", "password", "role", "avatar", "security_questions", "course_code", "course_name", "pin_code"]);
     }
 
     if (!filter_var($data['mail'], FILTER_VALIDATE_EMAIL)) {
-        send_error("Invalid email", 400);
+        Helpers::send_error("Invalid email", 400);
     }
 
     if (strlen($data['password']) < 8) {
-        send_error('Password must be atleast 8 characters', 400);
+        Helpers::send_error('Password must be atleast 8 characters', 400);
     }
 
     $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
@@ -35,6 +38,8 @@ if ($method === 'POST') {
             $user_object->mail = $data["mail"];
             $user_object->password = $hashedPassword;
             $user_object->role = $data["role"];
+            ## TODO
+            # $user_object->security_questions = new array();
 
             $user_object->study_field = $data["study_field"];
             $user_object -> class_year = $data["class_year"];
@@ -51,6 +56,9 @@ if ($method === 'POST') {
             $user_object->password = $hashedPassword;
             $user_object->role = $data["role"];
 
+            ## TODO
+            # $user_object->security_questions = new array();
+
             $user_object->avatar = $data["avatar"];
             $user_object->security_question = $data["security_question"];
             $user_object->security_answer = $hashed_security_answer;
@@ -66,11 +74,11 @@ if ($method === 'POST') {
             break;
     }
     if ($success) {
-        send_success(null, "Created", 204);
+        Helpers::send_success(null, "Created", 204);
         exit;
     }
 
-    send_error("Internal Server Error", 500);
+    Helpers::send_error("Internal Server Error", 500);
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

@@ -7,12 +7,7 @@ use PDOException;
 
 class Database
 {
-    # Fremtidig så skal verdiene her settes når objektet initsialiseres..
     private PDO $db;
-    # private string $_db_host = "db";
-    # private string $_db_name = "datasikkerhet";
-    # private string $_db_user = "root";
-    # private string $_db_passwd = "dev";
 
     public bool $connection_status;
 

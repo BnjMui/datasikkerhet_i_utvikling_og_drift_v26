@@ -1,9 +1,12 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Models\CreateMessageDto;
 
-$method = get_method();
-$data = get_request_data();
+$method = Helpers::get_method();
+$data = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 if ($method === "GET") {
     if (isset($data["pin_code"])) {
@@ -11,40 +14,40 @@ if ($method === "GET") {
     }
 
     if (!isset($pin_code)) {
-        $authenticated = require_auth();
+        $authenticated = Helpers::require_auth();
     }
 
     if (isset($pin_code)) {
-        $course_pin = repository()->getCoursePin($data["course_id"]);
-        if ($pin_code != $course_pin && !$authenticated["authenticated"]) {
-            send_error("Unauthorized", 401);
+        $course_pin = $repository->getCoursePin($data["course_id"]);
+        if ($pin_code != $course_pin && !Helpers::require_auth()["authenticated"]) {
+            Helpers::send_error("Unauthorized", 401);
         }
     }
 
-    $result = repository()->getMessages($data["course_id"]);
+    $result = $repository->getMessages($data["course_id"]);
 
     foreach ($result as $message) {
         $message_id = $message->message_id;
 
-        $message_replies = repository()->getReplies($message_id);
-        $message_comments = repository()->getComments($message_id);
+        $message_replies = $repository->getReplies($message_id);
+        $message_comments = $repository->getComments($message_id);
 
         $message->replies = $message_replies;
         $message->comments = $message_comments;
     }
 
-    send_success($result, "Success", 200);
+    Helpers::send_success($result, "Success", 200);
 }
 
 if ($method === "POST") {
-    validate_required($data, ["course_id", "text"]);
-    $authenticated = require_auth();
+    Helpers::validate_required($data, ["course_id", "text"]);
+    $authenticated = Helpers::require_auth();
 
     if (!$authenticated["authenticated"] || $authenticated["role"] != "student") {
-        send_error("Unauthorized", 401);
+        Helpers::send_error("Unauthorized", 401);
     }
     # TODO Sjekk om student har kurset...
-    $student_courses = repository()->getStudentCourses($authenticated["user_id"]);
+    $student_courses = $repository->getStudentCourses($authenticated["user_id"]);
     $student_has_course = false;
     foreach ($student_courses as $course) {
         if ($course->course_id == $data["course_id"]) {
@@ -52,7 +55,7 @@ if ($method === "POST") {
         }
     }
     if (!$student_has_course) {
-        send_error("Unauthorized", 401);
+        Helpers::send_error("Unauthorized", 401);
     }
 
     $message = new CreateMessageDto();
@@ -61,11 +64,11 @@ if ($method === "POST") {
     $message->course_id = $data["course_id"];
     $message->text = $data["text"];
 
-    $result = repository()->createMessage($message);
+    $result = $repository->createMessage($message);
 
     if ($result) {
-        send_success(null, "Success", 204);
+        Helpers::send_success(null, "Success", 204);
     }
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

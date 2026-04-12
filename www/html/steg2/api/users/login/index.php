@@ -1,29 +1,30 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
 
-$method = get_method();
-$data   = get_request_data();
-$repository = new Repository();
+$method = Helpers::get_method();
+$data   = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 if ($method === 'POST') {
-    validate_required($data, ['mail', 'password']);
+    Helpers::validate_required($data, ['mail', 'password']);
 
     $user_data = $repository->getUserLoginInfo($data["mail"]);
 
     if (!$user_data) {
-        send_error("User with provided mail or password combination not found", 404);
+        Helpers::send_error("User with provided mail or password combination not found", 404);
         exit;
     }
 
     if (password_verify($data["password"], $user_data->password) != $user_data->password) {
-        send_error("User with provided mail or password combination not found", 404);
+        Helpers::send_error("User with provided mail or password combination not found", 404);
         exit;
     }
 
-    $result = repository()->getUserById($user_data->user_id);
+    $result = $repository->getUserById($user_data->user_id);
 
-    send_success($result, "Success", 200);
+    Helpers::send_success($result, "Success", 200);
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

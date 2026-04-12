@@ -419,7 +419,7 @@ class Repository
     }
 
     # Reports
-    public function createReport(Report $report): bool
+    public function createReport(CreateBaseMessageReply $report): bool
     {
 
         $statement = $this->dbh->prepare(
