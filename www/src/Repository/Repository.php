@@ -87,7 +87,7 @@ class Repository
     public function getSecurityQuestionsByMail(string $mail): array
     {
         $statement = $this->dbh->prepare("
-            SELECT security_question FROM security_questions sq, users u
+            SELECT question_id, security_question FROM security_questions sq, users u
             WHERE sq.user_id = u.user_id AND u.mail = ?
             ");
 
@@ -98,13 +98,10 @@ class Repository
         return $result;
     }
 
-    #############
-    #CHANGE THIS#
-    #############
     public function getSecurityAnswersByMail(string $mail): mixed
     {
         $statement = $this->dbh->prepare("
-            SELECT u.mail, u.user_id, sq.security_question, sq.security_answer FROM security_questions sq, users u
+            SELECT sq.question_id, u.mail, u.user_id, sq.security_question, sq.security_answer FROM security_questions sq, users u
             WHERE sq.user_id = u.user_id AND u.mail = ?
             ");
 
