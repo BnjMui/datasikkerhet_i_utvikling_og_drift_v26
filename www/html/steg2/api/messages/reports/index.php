@@ -2,7 +2,7 @@
 
 require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
-use DatasikkerhetG7\Models\Report;
+use DatasikkerhetG7\Models\CreateBaseMessageReply;
 
 $method = Helpers::get_method();
 $data = Helpers::get_request_data();
@@ -20,7 +20,7 @@ if ($method === "POST")
 {
     Helpers::validate_required($data, ["message_id", "text"]);
 
-    $report = new Report();
+    $report = new CreateBaseMessageReply();
 
     $report->message_id = $data["message_id"];
     $report->text = $data["text"];

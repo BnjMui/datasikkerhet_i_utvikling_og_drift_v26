@@ -1,6 +1,5 @@
 <?php
 require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
-require __DIR__ . "/../../../../vendor/autoload.php";
 use DatasikkerhetG7\Api\Helpers;
 
 
