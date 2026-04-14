@@ -5,9 +5,10 @@ use DatasikkerhetG7\Api\Helpers;
 
 $method = Helpers::get_method();
 $data   = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 if ($method === 'POST') {
-    Helpers::validate_required($data, ["new_password"]);
+    Helpers::validate_required($data, ["mail", "password", "new_password"]);
 
     $authenticated = Helpers::require_auth();
 
@@ -16,9 +17,16 @@ if ($method === 'POST') {
         exit;
     }
 
+    $user_data = $repository->getUserLoginInfo($data["mail"]);
+
+if (!$user_data || !password_verify($data["password"], $user_data["password"])) {
+    Helpers::send_error("User with provided mail or password combination not found", 404);
+    exit;
+    }
+
     $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
 
-    $success = Helpers::repository()->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
+    $success = $repository->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
 
     Helpers::send_success(null, "Password updated", 204);
 }

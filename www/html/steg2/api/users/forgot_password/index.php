@@ -1,38 +1,52 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/api/helpers.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+use DatasikkerhetG7\Api\Helpers;
 
-$method = get_method();
-$data   = get_request_data();
-$repository = new Repository();
+$method = Helpers::get_method();
+$data = Helpers::get_request_data();
+$repository = Helpers::repository();
 
 if ($method === "GET") {
     if (!$data["mail"]) {
-        send_error("Bad Request", 404);
+        Helpers::send_error("Bad Request", 404);
         exit;
     }
 
-    $security_question = $repository->getSecurityQuestionByMail($data["mail"]);
+    $security_questions = $repository->getSecurityQuestionsByMail($data["mail"]);
 
-    send_success($security_question, "Success", 200);
+    Helpers::send_success($security_questions, "Success", 200);
     exit;
 }
 
 if ($method === 'POST') {
-    validate_required($data, ["mail", "security_answer", "new_password"]);
-    
+    Helpers::validate_required($data, ["mail", "security_answers", "new_password"]);
 
-    $security_answer = $repository->getSecurityAnswerByMail($data["mail"]);
 
-    if (!password_verify($data["security_answer"], $security_answer["security_answer"])) {
-        send_error("Answer is not correct", 404);
+    $security_answers = $repository->getSecurityAnswersByMail($data["mail"]);
+    foreach ($data["security_answers"] as $question) {
+        foreach ($security_answers as $security_answer) {
+            if ($question["question_id"] == $security_answer["question_id"]) {
+                if (!password_verify($question["security_answer"], $security_answer["security_answer"])) {
+                    Helpers::send_error("Bad Request", 400);
+                    exit;
+                }
+            }
+        }
     }
 
+
+
+    # if (!password_verify($data["security_answers"], $security_answers["security_answer"])) {
+    #     Helpers::send_error("Answer is not correct", 404);
+    # }
+
+
     $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
+    $user_id = $repository->getUserLoginInfo($data["mail"])->user_id;
+    $success = $repository->updatePasswordByUserId($user_id, $hashed_password);
 
-    $success = $repository->updatePasswordByUserId($security_answer["user_id"], $hashed_password);
-
-    send_success(null, "Password updated", 204);
+    Helpers::send_success(null, "Password updated", 204);
 }
 
-send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
+Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

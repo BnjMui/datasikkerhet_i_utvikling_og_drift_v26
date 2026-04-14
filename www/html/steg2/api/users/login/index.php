@@ -17,7 +17,7 @@ if ($method === 'POST') {
         exit;
     }
 
-    if (password_verify($data["password"], $user_data->password) != $user_data->password) {
+    if (!password_verify($data["password"], $user_data["password"])) {
         Helpers::send_error("User with provided mail or password combination not found", 404);
         exit;
     }
