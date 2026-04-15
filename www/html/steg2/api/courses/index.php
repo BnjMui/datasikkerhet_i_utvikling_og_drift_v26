@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/api/bootstrap.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
 
 
