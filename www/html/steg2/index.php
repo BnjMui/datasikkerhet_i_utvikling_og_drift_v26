@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include_once $_SERVER["DOCUMENT_ROOT"] . "/bootstrap.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Frontend\ApiClient;
 
 # include_once $_SERVER["DOCUMENT_ROOT"] . '/../course_api_service.php';

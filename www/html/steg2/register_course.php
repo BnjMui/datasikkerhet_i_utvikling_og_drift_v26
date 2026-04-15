@@ -1,6 +1,6 @@
 <?php
 
-include_once $_SERVER["DOCUMENT_ROOT"] . "/bootstrap.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 
 use DatasikkerhetG7\Frontend\ApiClient;
 
