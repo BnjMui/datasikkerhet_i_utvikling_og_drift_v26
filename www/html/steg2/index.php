@@ -1,18 +1,27 @@
 <?php
 session_start();
 
-include_once $_SERVER["DOCUMENT_ROOT"] . '/../course_api_service.php';
-include_once $_SERVER["DOCUMENT_ROOT"] . '/../login_api_service.php';
-include_once $_SERVER["DOCUMENT_ROOT"] . '/../api_client.php';
+include_once $_SERVER["DOCUMENT_ROOT"] . "/bootstrap.php";
+use DatasikkerhetG7\Frontend\ApiClient;
+
+# include_once $_SERVER["DOCUMENT_ROOT"] . '/../course_api_service.php';
+# include_once $_SERVER["DOCUMENT_ROOT"] . '/../login_api_service.php';
+# include_once $_SERVER["DOCUMENT_ROOT"] . '/../api_client.php';
 
 // Hent brukerinfo fra session
-$user = isset($_SESSION['session_data']) ? $_SESSION['session_data'] : null;
-$role = $user["role"];
-$student_courses = [];
+$user = null;
+$role = null;
+$student_courses = null;
 
-$courses = get_courses();
-if ($user["role"] == "student") {
-    $student_courses = get_student_courses($user["user_id"]);
+if (isset($_SESSION['session_data'])) {
+
+    $user = $_SESSION['session_data'];
+    $role = $user["role"];
+
+    $courses = ApiClient::get_courses();
+    if ($user["role"] == "student") {
+        $student_courses = ApiClient::get_student_courses();
+    }
 }
 
 
@@ -25,11 +34,11 @@ if ($user["role"] == "student") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studentportal - hjemmeside</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
 
     <main>
         <header class="page-header">
@@ -45,7 +54,7 @@ if ($user["role"] == "student") {
                 </p>
             <?php else: ?>
                 <p class="rolle-info">
-                    Du er ikke innlogget. <a href="/steg1/login">Logg inn</a> for flere funksjoner.
+                    Du er ikke innlogget. <a href="/steg2/login">Logg inn</a> for flere funksjoner.
                 </p>
             <?php endif; ?>
         </header>
@@ -57,7 +66,7 @@ if ($user["role"] == "student") {
                 <p><strong>E-post:</strong> <?php echo htmlspecialchars($user['mail']); ?></p>
                 <p><strong>Rolle:</strong> <?php echo ucfirst(htmlspecialchars($user['role'])); ?></p>
                 <p>
-                    <a href="/steg1/change_password">
+                    <a href="/steg2/change_password">
                         Endre passord
                     </a>
                 </p>
@@ -82,7 +91,7 @@ if ($user["role"] == "student") {
                             <article class="emne-kort">
                                 <a href=
                                     <?php
-                                    echo "/steg1/course?course_id=" .
+                                    echo "/steg2/course?course_id=" .
                                     urlencode($course['course_id']) .
                                     "&course_code=" .
                                     urlencode($course["course_code"]);
@@ -119,7 +128,7 @@ if ($user["role"] == "student") {
                             <article class="emne-kort">
                                 <a href=
                                     <?php
-                                        echo "/steg1/course?course_id=" .
+                                        echo "/steg2/course?course_id=" .
                                         urlencode($course['course_id']) .
                                         "&course_code=" .
                                         urlencode($course["course_code"]);
@@ -132,7 +141,7 @@ if ($user["role"] == "student") {
                                 <p class="emne-navn"><?php echo htmlspecialchars($course['course_name']); ?></p>
                                         <?php
                                     if ($user["role"] == "student") { ?>
-                                    <form method="POST" action="/steg1/register_course.php">
+                                    <form method="POST" action="/steg2/register_course.php">
                                         <input type="hidden" name="course_id" value="<?php echo $course["course_id"]; ?>" />
                                             <input type="submit" value="Registrer"/>
                                         </form>
@@ -159,7 +168,7 @@ if ($user["role"] == "student") {
         </section>
     </main>
 
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg1/footer.php"; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/footer.php"; ?>
 </body>
 
 </html>

@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-include_once $_SERVER["DOCUMENT_ROOT"] . '../../course_api_service.php';
-include_once $_SERVER["DOCUMENT_ROOT"] . '../../login_api_service.php';
-include_once $_SERVER["DOCUMENT_ROOT"] . '../../api_client.php';
+include_once $_SERVER["DOCUMENT_ROOT"] . 'bootstrap.php';
+
+use DatasikkerhetG7\Frontend\ApiClient;
 
 $user = isset($_SESSION['session_data']) ? $_SESSION['session_data'] : null;
 
@@ -12,7 +12,7 @@ $course_code = $_GET["course_code"];
 
 $_SESSION["prev_course_code"] = $course_code;
 if ($user && $course_id) {
-    $course = get_course($course_id);
+    $course = ApiClient::get_course($course_id);
 }
 
 $error_message = false;
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Ingen pin, prøv igjen.";
     }
     if (isset($pin_code)) {
-        $course = get_course($course_id, $pin_code);
+        $course = ApiClient::get_course($course_id, $pin_code);
         $_SESSION["pin_code"] = $pin_code;
     }
     if (!$course) {
@@ -43,15 +43,15 @@ if ($course) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Emneside - Emneportal</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
 
     <main>
         <nav aria-label="Navigasjon">
-            <a href="/steg1" class="back-link">
+            <a href="/steg2" class="back-link">
                 <span aria-hidden="true">←</span> Tilbake til emneoversikt
             </a>
         </nav>
@@ -68,7 +68,7 @@ if ($course) {
                         </h2>
                         <p>Skriv inn PIN-koden for å få tilgang til emneinnholdet.</p>
                         <p>
-                            <small><a href="/steg1/login">Logg inn</a> for å slippe PIN-kode.</small>
+                            <small><a href="/steg2/login">Logg inn</a> for å slippe PIN-kode.</small>
                         </p>
                     </header>
 
@@ -116,7 +116,7 @@ if ($course) {
                 </header>
             <section>
                 <h2>Emneansvarlig</h2>
-                <img src="/steg1/register/<?php echo $lecturer["avatar"];?>" width="250"/>
+                <img src="/steg2/register/<?php echo $lecturer["avatar"];?>" width="250"/>
                 <p>
                     <?php echo $lecturer["first_name"] . " " . $lecturer["last_name"]; ?>
                 </p>
@@ -136,7 +136,7 @@ if ($course) {
                             <?php echo $message["created_at"]; ?>
                             </p>
                             <?php if (!$user): ?>
-                            <form method="POST" action="/steg1/course/post_comment.php">
+                            <form method="POST" action="/steg2/course/post_comment.php">
                         <input
                             id="message"
                             name="message"
@@ -153,7 +153,7 @@ if ($course) {
 
                             <?php endif ?>
                             <?php if ($user["role"] == "lecturer" && !$message["replies"]): ?>
-                            <form method="POST" action="/steg1/course/post_comment.php">
+                            <form method="POST" action="/steg2/course/post_comment.php">
                         <input
                             id="message"
                             name="message"
@@ -205,7 +205,7 @@ if ($course) {
 
                 <?php if ($user["role"] == "student"): ?>
                 <section>
-                    <form method="POST" action="/steg1/course/post_comment.php">
+                    <form method="POST" action="/steg2/course/post_comment.php">
                         <input
                             id="message"
                             name="message"
@@ -231,7 +231,7 @@ if ($course) {
 
     </main>
 
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg1/footer.php"; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/footer.php"; ?>
 </body>
 
 </html>

@@ -1,5 +1,8 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . "/../login_api_service.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "bootstrap.php";
+
+use DatasikkerhetG7\Frontend\ApiClient;
+
 session_start();
 
 $error_message = "";
@@ -14,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Passordene er ikke like";
     }
     if ($password_matches) {
-        $result = change_password($new_password);
+        $result = ApiClient::change_password($new_password);
 
         if (!$result) {
             $error_message = "Ukjent feil";
         }
-        header("Location: /steg1");
+        header("Location: /steg2");
         exit;
     }
 }
@@ -31,11 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Endre passord - Emneportal</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
     <main>
         <section class="login-container">
             <header>
@@ -81,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
     </main>
 
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg1/footer.php"; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/footer.php"; ?>
 </body>
 
 </html>

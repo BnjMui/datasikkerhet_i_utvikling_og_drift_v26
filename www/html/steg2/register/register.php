@@ -1,6 +1,8 @@
 <?php
 
-include_once $_SERVER["DOCUMENT_ROOT"] . "/../login_api_service.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/bootstrap.php";
+
+use DatasikkerhetG7\Frontend\ApiClient;
 
 $first_name = $_POST["first_name"];
 $last_name = $_POST["last_name"];
@@ -9,7 +11,7 @@ $role = $_POST["role"];
 $password = $_POST["password"];
 
 if ($role == "student") {
-    register_student(
+    ApiClient::register_student(
         $first_name,
         $last_name,
         $mail,
@@ -19,7 +21,7 @@ if ($role == "student") {
     );
 }
 if ($role == "lecturer") {
-    echo print_r($_FILES["avatar"]);
+    #echo print_r($_FILES["avatar"]);
     $avatar_directory = "profile_avatars/";
     $target_file = $avatar_directory . strtolower($first_name . $last_name) . basename($_FILES["avatar"]["name"]);
     $uploadOk = 1;
@@ -46,19 +48,18 @@ if ($role == "lecturer") {
 
         print_r($target_file);
         move_uploaded_file($_FILES["avatar"]["tmp_name"], $target_file);
-        register_lecturer(
+        ApiClient::register_lecturer(
             $first_name,
             $last_name,
             $mail,
             $password,
             $target_file,
-            $_POST["security_question"],
-            $_POST["security_answer"],
+            $_POST["security_questions"],
             $_POST["course_code"],
             $_POST["course_name"],
             $_POST["pin_code"]
         );
     }
 }
-header("Location: /steg1/login");
+header("Location: /steg2/login");
 exit;

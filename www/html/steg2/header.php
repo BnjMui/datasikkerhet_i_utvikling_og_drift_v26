@@ -3,7 +3,7 @@
 ?>
 <header role="banner">
     <nav aria-label="Hovednavigasjon">
-        <a href="/steg1/" class="logo">
+        <a href="/steg2/" class="logo">
             <span aria-hidden="true"></span> Studentportal
         </a>
     </nav>
@@ -25,12 +25,12 @@
                     <strong class="bruker-navn"><?php echo htmlspecialchars($user["first_name"]); ?></strong>
                 <?php endif; ?>
             </p>
-            <a href="/steg1/logout.php" class="btn-logout">Logg ut</a>
+            <a href="/steg2/logout.php" class="btn-logout">Logg ut</a>
         <?php else: ?>
             <p class="guest-info">
                 <span aria-hidden="true"></span> Gjest
             </p>
-            <button  class="btn-login"><a href="/steg1/login">Logg inn</a></button>
+            <button  class="btn-login"><a href="/steg2/login">Logg inn</a></button>
         <?php endif; ?>
     </aside>
 </header>

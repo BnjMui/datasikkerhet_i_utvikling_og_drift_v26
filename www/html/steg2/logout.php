@@ -5,5 +5,5 @@ $_SESSION = [];
 
 session_destroy();
 
-header('Location: /steg1');
+header('Location: /steg2');
 exit;

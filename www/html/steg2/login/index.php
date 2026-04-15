@@ -1,11 +1,15 @@
 <?php
+
+include_once $_SERVER["DOCUMENT_ROOT"] . '/bootstrap.php';
+
+use DatasikkerhetG7\Frontend\ApiClient;
+
 session_start();
 
-include_once $_SERVER["DOCUMENT_ROOT"] . '/../login_api_service.php';
 
 // Hvis allerede innlogget, redirect til hjemmeside
 if (isset($_SESSION['session_data']) && isset($_SESSION['session_data']['user_id'])) {
-    header('Location: /steg1');
+    header('Location: /steg2');
     exit;
 }
 
@@ -16,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mail = isset($_POST['mail']) ? trim($_POST['mail']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-    $user_data = get_login($mail, $password);
+    $user_data = ApiClient::login($mail, $password);
     if ($user_data) {
         $_SESSION["session_data"] = $user_data;
-        header("Location: /steg1");
+        header("Location: /steg2");
     }
     $error_message = "Feil e-post eller passord, vennligst forsøk igjen.";
 }
@@ -32,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logg inn - Emneportal</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
     <main>
         <article class="login-container">
             <header>
@@ -80,13 +84,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <section>
-                <p>Har du ikke en konto? <a href="/steg1/register">Registrer deg her</a></p>
-                <p>Glemt passord som foreleser? <a href="/steg1/login/forgot_password">Tilbakestill her</a></p>
+                <p>Har du ikke en konto? <a href="/steg2/register">Registrer deg her</a></p>
+                <p>Glemt passord som foreleser? <a href="/steg2/login/forgot_password">Tilbakestill her</a></p>
             </section>
         </article>
     </main>
 
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/footer.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/footer.php'; ?>
 </body>
 
 </html>

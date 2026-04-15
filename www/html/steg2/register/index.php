@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION["session_data"]["user_id"])) {
-    header('Location: /steg1');
+    header('Location: /steg2');
     exit;
 }
 if (isset($_POST["role"])) {
@@ -21,7 +21,7 @@ $error_message = '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrering - Emneportal</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 
 <body>
@@ -53,7 +53,7 @@ $error_message = '';
                 <section>
                 <h3>Registreringsskjema</h3>
 
-                <form method="POST" action="/steg1/register/register.php" class="form-group" enctype="multipart/form-data">
+                <form method="POST" action="/steg2/register/register.php" class="form-group" enctype="multipart/form-data">
                         <fieldset>
                             <legend>Kontaktinformasjon</legend>
                         <label for="first_name">Fornavn *</label>
@@ -119,12 +119,12 @@ $error_message = '';
             </section>
 
             <section class="login-link">
-                <p>Har du allerede en konto? <a href="/steg1/login">Logg inn her</a></p>
+                <p>Har du allerede en konto? <a href="/steg2/login">Logg inn her</a></p>
                 </article>
             </section>
     </main>
 
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/footer.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/footer.php'; ?>
 
 </body>
 

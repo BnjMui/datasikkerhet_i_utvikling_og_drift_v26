@@ -1,5 +1,8 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/../login_api_service.php';
+include_once $_SERVER["DOCUMENT_ROOT"] . 'bootstrap.php';
+
+use DatasikkerhetG7\Frontend\ApiClient;
+
 session_start();
 
 $error_message = "";
@@ -16,13 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if ($password_matches) {
 
-            $result = forgot_password($_POST["mail"], $_POST["security_answer"], $new_password);
+            $result = ApiClient::forgot_password($_POST["mail"], $_POST["security_answer"], $new_password);
 
-            header("Location: /steg1/login");
+            header("Location: /steg2/login");
         }
     }
     if (!$_POST["new_password"] && $_POST["mail"]) {
-        $result = get_security_question($_POST["mail"]);
+        $result = ApiClient::get_security_questions($_POST["mail"]);
 
         $security_question = $result;
     }
@@ -36,11 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Glemt passord - Foreleser</title>
-    <link rel="stylesheet" href="/steg1/styles.css">
+    <link rel="stylesheet" href="/steg2/styles.css">
 </head>
 
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
     <main>
         <article class="login-container">
             <header>
@@ -49,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if ($success): ?>
                 <p class="success-message">Passord endret!</p>
-                <p><a href="/steg1/login">Gå til innlogging</a></p>
+                <p><a href="/steg2/login">Gå til innlogging</a></p>
                 <?php endif ?>
             <?php if (!$security_question): ?>
 
@@ -86,10 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
 
-            <p><a href="/steg1/login">Tilbake til innlogging</a></p>
+            <p><a href="/steg2/login">Tilbake til innlogging</a></p>
         </article>
     </main>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/footer.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/footer.php'; ?>
 </body>
 
 </html>
