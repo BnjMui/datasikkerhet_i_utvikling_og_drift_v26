@@ -11,8 +11,6 @@ if (isset($_POST["role"])) {
     $user_type = "student";
 }
 
-$error_message = '';
-
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -25,18 +23,11 @@ $error_message = '';
 </head>
 
 <body>
-    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg1/header.php'; ?>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . '/steg2/header.php'; ?>
 
     <main role="main">
         <section class="register-container">
             <h1>Registrering</h1>
-
-            <?php if ($error_message): ?>
-                <div class="error-message">
-                    <?php echo htmlspecialchars($error_message); ?>
-                </div>
-            <?php endif; ?>
-
                 <section>
                     <h3>Velg brukertype</h3>
                     <form method="POST" action="">
@@ -54,23 +45,29 @@ $error_message = '';
                 <h3>Registreringsskjema</h3>
 
                 <form method="POST" action="/steg2/register/register.php" class="form-group" enctype="multipart/form-data">
-                        <fieldset>
-                            <legend>Kontaktinformasjon</legend>
+                    <fieldset>
+                        <legend>Kontaktinformasjon</legend>
                         <label for="first_name">Fornavn *</label>
-                        <input type="text" id="first_name" name="first_name" placeholder="Fornavn" required>
+                        <input type="text" id="first_name" name="first_name" placeholder="Fornavn" required/>
 
                         <label for="last_name">Etternavn *</label>
-                        <input type="text" id="last_name" name="last_name" placeholder="Etternavn" required>
+                        <input type="text" id="last_name" name="last_name" placeholder="Etternavn" required/>
 
                         <label for="mail">E-post *</label>
-                        <input type="mail" id="mail" name="mail" placeholder="epost@eksempel.no" required>
+                        <input type="mail" id="mail" name="mail" placeholder="epost@eksempel.no" required/>
+
+                        <label for="security_question">Sikkerhetsspørsmål *</label>
+                        <input type="text" id="security_question" name="security_question" placeholder="Skriv ditt sikkerhetsspørsmål" required/>
+
+                        <label for="security_answer">Svar på sikkerhetsspørsmål *</label>
+                        <input type="text" id="security_answer" name="security_answer" placeholder="Svar" required/>
 
                         <label for="password">Passord (minimum 8 tegn) *</label>
-                        <input type="password" id="password" name="password" placeholder="********" minlength="8">
+                        <input type="password" id="password" name="password" placeholder="********" minlength="8"/>
 
                         <label for="password_confirm">Bekreft passord *</label>
-                        <input type="password" id="password_confirm" name="password_confirm" placeholder="********" minlength="8">
-                            </fieldset>
+                        <input type="password" id="password_confirm" name="password_confirm" placeholder="********" minlength="8"/>
+                    </fieldset>
 
                 <!-- Student-spesifikk del -->
                     <?php if ($user_type == "student"): ?>
@@ -86,7 +83,7 @@ $error_message = '';
                             </fieldset>
                 </article>
                     <?php endif ?>
-                    <?php if($user_type == "lecturer"): ?>
+                    <?php if ($user_type == "lecturer"): ?>
                         <input type="hidden" name="role" value="lecturer" />
                     <fieldset>
                         <legend>Foreleserinformasjon</legend>
@@ -104,11 +101,6 @@ $error_message = '';
                                 <input type="file" id="avatar" name="avatar" accept="image/png, image/jpg">
                                 <p class="file-input-info">Tillatte formater: JPG, PNG (maks 5MB)</p>
 
-                            <label for="security_question">Sikkerhetsspørsmål *</label>
-                            <input type="text" id="security_question" name="security_question" placeholder="Skriv ditt sikkerhetsspørsmål" required>
-
-                            <label for="security_answer">Svar på sikkerhetsspørsmål *</label>
-                            <input type="text" id="security_answer" name="security_answer" placeholder="Svar" required>
                         </fieldset>
 
 

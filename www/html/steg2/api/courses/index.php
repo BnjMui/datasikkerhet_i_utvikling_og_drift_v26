@@ -56,7 +56,7 @@ if ($method === "POST") {
     }
 
     if ($result = $repository->addCourseToStudent($data["student_id"], $data["course_id"])) {
-        Helpers::send_success(null, "Course added to student", 204);
+        Helpers::send_success(["success" => true], "Success", 200);
         exit;
     }
 }

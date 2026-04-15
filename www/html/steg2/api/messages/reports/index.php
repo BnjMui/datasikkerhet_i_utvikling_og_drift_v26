@@ -28,7 +28,7 @@ if ($method === "POST")
     $result = $repository->createReport($report);
 
     if ($result) {
-        Helpers::send_success(null, "Success", 204);
+        Helpers::send_success(["success" => true], "Success", 200);
     }
 }
 

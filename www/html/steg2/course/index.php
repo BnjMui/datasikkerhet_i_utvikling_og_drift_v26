@@ -10,6 +10,11 @@ $user = isset($_SESSION['session_data']) ? $_SESSION['session_data'] : null;
 $course_id = $_GET['course_id'];
 $course_code = $_GET["course_code"];
 
+$pin_code = null;
+$course = null;
+$course_data = null;
+$lecturer = null;
+
 $_SESSION["prev_course_code"] = $course_code;
 if ($user && $course_id) {
     $course = ApiClient::get_course($course_id);
@@ -152,7 +157,7 @@ if ($course) {
                     </form>
 
                             <?php endif ?>
-                            <?php if ($user["role"] == "lecturer" && !$message["replies"]): ?>
+                            <?php if (isset($user) && $user["role"] == "lecturer" && !$message["replies"]): ?>
                             <form method="POST" action="/steg2/course/post_comment.php">
                         <input
                             id="message"

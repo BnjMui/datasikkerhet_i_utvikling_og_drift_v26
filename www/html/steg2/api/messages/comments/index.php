@@ -34,7 +34,7 @@ if ($method === "POST") {
     $result = $repository->createComment($comment);
 
     if ($result) {
-        Helpers::send_success(null, "Success", 204);
+        Helpers::send_success(["success" => true], "Success", 200);
     }
 }
 

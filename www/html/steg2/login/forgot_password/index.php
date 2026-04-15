@@ -7,10 +7,11 @@ session_start();
 
 $error_message = "";
 $success = false;
+$security_question = "";
 
 // Håndter innlogging
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($_POST["new_password"]) {
+    if (isset($_POST["new_password"])) {
         $new_password = $_POST["new_password"];
         $password_matches = $new_password == $_POST["new_password_confirm"];
 
@@ -19,12 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if ($password_matches) {
 
-            $result = ApiClient::forgot_password($_POST["mail"], $_POST["security_answer"], $new_password);
+            if ($result = ApiClient::forgot_password($_POST["mail"], $_POST["security_answer"], $new_password)) {
+                $success = true;
+            }
 
             header("Location: /steg2/login");
         }
     }
-    if (!$_POST["new_password"] && $_POST["mail"]) {
+    if (!isset($_POST["new_password"]) && isset($_POST["mail"])) {
         $result = ApiClient::get_security_questions($_POST["mail"]);
 
         $security_question = $result;
@@ -47,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <main>
         <article class="login-container">
             <header>
-                <h1>Glemt passord (Foreleser)</h1>
+                <h1>Glemt passord</h1>
             </header>
 
             <?php if ($success): ?>
@@ -63,13 +66,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                 <?php endif ?>
 
+                <?php if ($security_question == false): ?>
+                <p>Ingen sikkerhetsspørsmål tilgjengelig</p>
+                <?php endif; ?>
                 <?php if ($security_question): ?>
                     <form method="POST" action="" aria-label="Svar sikkerhetsspørsmål" class="form-group">
                         <input type="hidden" name="mail" value="<?php echo $_POST['mail']; ?>">
                     <?php echo $_POST["mail"]; ?>
 
                             <label>Sikkerhetsspørsmål</label>
-                        <p><strong><?php echo htmlspecialchars($security_question); ?></strong></p>
+                        <p><strong><?php echo htmlspecialchars($security_question["security_question"]); ?></strong></p>
 
                             <label for="security_answer">Svar</label>
                             <input id="security_answer" type="text" name="security_answer" required>

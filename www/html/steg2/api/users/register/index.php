@@ -2,6 +2,7 @@
 
 require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Models\CreateCourseDto;
 use DatasikkerhetG7\Models\CreateLecturerDto;
 use DatasikkerhetG7\Models\CreateStudentDto;
 
@@ -12,11 +13,11 @@ $repository = Helpers::repository();
 if ($method === 'POST') {
 
     if ($data["role"] == "student") {
-        $valid = Helpers::validate_required($data, ['first_name', 'last_name', 'mail', 'password', "role", "security_questions", 'study_field', 'class_year']);
+        Helpers::validate_required($data, ['first_name', 'last_name', 'mail', 'password', "role", 'study_field', 'class_year']);
     }
 
     if ($data["role"] == "lecturer") {
-        $valid = Helpers::validate_required($data, ["first_name", "last_name", "mail", "password", "role", "avatar", "security_questions", "course_code", "course_name", "pin_code"]);
+        Helpers::validate_required($data, ["first_name", "last_name", "mail", "password", "role", "course_code", "course_name", "pin_code"]);
     }
 
     if (!filter_var($data['mail'], FILTER_VALIDATE_EMAIL)) {
@@ -41,6 +42,14 @@ if ($method === 'POST') {
             ## TODO
             # $user_object->security_questions = new array();
 
+            $user_object->security_questions = [];
+            foreach ($data["security_questions"] as $question) {
+                $user_object->security_questions[] = [
+                "security_question" => $question["security_question"],
+                "security_answer" => password_hash($question["security_answer"], PASSWORD_BCRYPT)
+                ];
+            }
+
             $user_object->study_field = $data["study_field"];
             $user_object -> class_year = $data["class_year"];
 
@@ -48,7 +57,6 @@ if ($method === 'POST') {
             break;
         case 'lecturer':
             $user_object = new CreateLecturerDto();
-            $hashed_security_answer = password_hash($data["security_answer"], PASSWORD_BCRYPT);
 
             $user_object->first_name = $data["first_name"];
             $user_object->last_name = $data["last_name"];
@@ -58,10 +66,16 @@ if ($method === 'POST') {
 
             ## TODO
             # $user_object->security_questions = new array();
+            $user_object->security_questions = [];
+            foreach ($data["security_questions"] as $question) {
+                $user_object->security_questions[] = [
+                "security_question" => $question["security_question"],
+                "security_answer" => password_hash($question["security_answer"], PASSWORD_BCRYPT)
+                ];
+            }
 
             $user_object->avatar = $data["avatar"];
-            $user_object->security_question = $data["security_question"];
-            $user_object->security_answer = $hashed_security_answer;
+            $user_object->course = new CreateCourseDto();
 
             $user_object->course->course_code = $data["course_code"];
             $user_object->course->course_name = $data["course_name"];
@@ -74,7 +88,7 @@ if ($method === 'POST') {
             break;
     }
     if ($success) {
-        Helpers::send_success(null, "Created", 204);
+        Helpers::send_success(["success" => true], "Created", 200);
         exit;
     }
 

@@ -97,10 +97,10 @@ class Repository
         return $result;
     }
 
-    public function getSecurityAnswersByMail(string $mail): mixed
+    public function getSecurityAnswersByMail(string $mail): UserSecurityAnswer
     {
         $statement = $this->dbh->prepare("
-            SELECT sq.question_id, u.mail, u.user_id, sq.security_question, sq.security_answer FROM security_questions sq, users u
+            SELECT question_id, u.mail, sq.user_id, security_question, security_answer FROM security_questions sq, users u
             WHERE sq.user_id = u.user_id AND u.mail = ?
             ");
 
@@ -108,7 +108,7 @@ class Repository
 
         $result = $statement->fetchAll(PDO::FETCH_CLASS, UserSecurityAnswer::class);
 
-        return $result;
+        return $result[0];
     }
 
     public function createUser(string $uid, CreateUserDto $userData): bool
@@ -120,17 +120,21 @@ class Repository
         );
 
         ####### TO REVIEW!!!
-        foreach ($userData->security_questions as $security_question_without_uid) {
-            $security_question = new CreateSecurityQuestion();
-            $security_question->user_id = $uid;
-            $security_question->security_question = $security_question_without_uid["security_question"];
-            $security_question->security_answer = $security_question_without_uid["security_answer"];
 
-            $this->createSecurityQuestion($security_question);
+
+        $result = $statement->execute([$uid, $userData->first_name, $userData->last_name, $userData->mail, $userData->role, $userData->password]);
+
+        if ($userData->security_questions) {
+            foreach ($userData->security_questions as $security_question_without_uid) {
+                $security_question = new CreateSecurityQuestion();
+                $security_question->user_id = $uid;
+                $security_question->security_question = $security_question_without_uid["security_question"];
+                $security_question->security_answer = $security_question_without_uid["security_answer"];
+
+                $this->createSecurityQuestion($security_question);
+            }
         }
-
-
-        return $statement->execute([$uid, $userData->first_name, $userData->last_name, $userData->mail, $userData->role, $userData->password]);
+        return $result;
     }
 
     public function createStudent(CreateStudentDto $userData): bool
@@ -160,15 +164,16 @@ class Repository
     {
         $statement = $this->dbh->prepare(
             "INSERT INTO lecturers
-                (lecturer_id, avatar, security_question, security_answer)
-            VALUES (?, ?, ?, ?)"
+                (lecturer_id, avatar)
+            VALUES (?, ?)"
         );
         try {
             $uid = $this->uuid();
             $this->dbh->beginTransaction();
 
             $this->createUser($uid, $userData);
-            $statement->execute([$uid, $userData->avatar, $userData->security_question, $userData->security_answer]);
+            $statement->execute([$uid, $userData->avatar]);
+
             $this->createCourse($uid, $userData->course);
 
             return $this->dbh->commit();
@@ -214,7 +219,7 @@ class Repository
     public function getLecturerDataById(string $user_id): Lecturer | false
     {
         $statement = $this->dbh->prepare("
-            SELECT lecturer_id, first_name, last_name, mail, avatar FROM lecturers l, users u
+            SELECT user_id, first_name, last_name, mail, avatar FROM lecturers l, users u
             WHERE lecturer_id = user_id AND lecturer_id = ?
             ");
 

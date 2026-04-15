@@ -1,4 +1,5 @@
 <?php
+
 namespace DatasikkerhetG7\Frontend;
 
 use CurlHandle;
@@ -73,7 +74,7 @@ class ApiClient
         if ($data["success"] && isset($data["data"])) {
             return $data["data"];
         }
-        return $data["success"];
+        return false;
     }
 
     public static function student_add_course(string $student_id, int $course_id): bool
@@ -150,7 +151,7 @@ class ApiClient
     }
 
 
-    public static function register_student(string $first_name, string $last_name, string $mail, string $password, string $study_field, int $class_year): bool
+    public static function register_student(string $first_name, string $last_name, string $mail, array $security_questions, string $password, string $study_field, int $class_year): bool
     {
         $role = "student";
 
@@ -158,6 +159,7 @@ class ApiClient
             "first_name" => $first_name,
             "last_name" => $last_name,
             "mail" => $mail,
+            "security_questions" => $security_questions,
             "role" => $role,
             "password" => $password,
             "study_field" => $study_field,
@@ -171,7 +173,7 @@ class ApiClient
         return $result["success"];
     }
 
-    public static function register_lecturer(string $first_name, string $last_name, string $mail, string $password, string $avatar, array $security_questions, string $course_code, string $course_name, string $pin_code)
+    public static function register_lecturer(string $first_name, string $last_name, string $mail, string $password, string $avatar, array $security_questions, string $course_code, string $course_name, string $pin_code): bool
     {
         $role = "lecturer";
 
@@ -197,7 +199,7 @@ class ApiClient
     }
 
     ## Update this
-    public static function change_password( $new_password): bool
+    public static function change_password($new_password): bool
     {
         $user_id_token = $_SESSION["session_data"]["user_id"];
         $result = self::handleRequest(self::curlHandler("POST", "/users/update_password", ["new_password" => $new_password], ["AUTHENTICATION: $user_id_token"]));
@@ -205,8 +207,11 @@ class ApiClient
         if ($result === false) {
             return false;
         }
+        if ($result["data"] == null) {
+            return false;
+        }
 
-        return $result["success"];
+        return $result["data"];
     }
 
     # Update this
@@ -217,8 +222,11 @@ class ApiClient
         if ($result === false) {
             return false;
         }
+        if (!isset($result["data"])) {
+            return false;
+        }
 
-        return $result["data"];
+        return $result["data"][0];
     }
 
     # Update this
@@ -244,6 +252,10 @@ class ApiClient
         }
 
         $data = json_decode($response, true);
+        if ($data == null)
+        {
+            return false;
+        }
         return $data;
     }
 
@@ -251,17 +263,8 @@ class ApiClient
     {
         $curl = curl_init();
         $method = strtoupper($method);
+        $curl_opts = array();
 
-        if ($method == "POST") {
-            $payload = json_encode($data);
-            $headers[] = "Content-Type: application/json";
-            curl_setopt_array(
-                $curl,
-                [
-                    CURLOPT_POSTFIELDS => $payload
-                ]
-            );
-        }
 
         // Konfigurer cURL-alternativer
         $curl_opts = [
@@ -274,6 +277,15 @@ class ApiClient
             CURLOPT_TIMEOUT => 1000
 
         ];
+
+        if ($method == "POST") {
+            $payload = json_encode($data);
+            $headers[] = "Content-Type: application/json";
+            $curl_opts[CURLOPT_HTTPHEADER] = $headers;
+            $curl_opts[CURLOPT_POST] = true;
+            $curl_opts[CURLOPT_POSTFIELDS] = $payload;
+            $curl_opts[CURLOPT_POSTREDIR] = CURL_REDIR_POST_ALL;
+        }
 
         curl_setopt_array($curl, $curl_opts);
 

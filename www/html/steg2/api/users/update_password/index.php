@@ -28,7 +28,7 @@ if (!$user_data || !password_verify($data["password"], $user_data["password"])) 
 
     $success = $repository->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
 
-    Helpers::send_success(null, "Password updated", 204);
+    Helpers::send_success(["success" => true], "Success", 200);
 }
 
 Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

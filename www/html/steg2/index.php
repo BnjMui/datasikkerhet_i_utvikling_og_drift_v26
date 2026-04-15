@@ -24,6 +24,10 @@ if (isset($user["role"]) && $user["role"] == "student") {
     $student_courses = ApiClient::get_student_courses();
 }
 
+if (!$student_courses) {
+    $student_courses = [];
+}
+
 
 
 ?>

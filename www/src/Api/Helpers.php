@@ -70,7 +70,7 @@ class Helpers
         );
     }
 
-    public static function validate_required(mixed $data, mixed $fields): mixed
+    public static function validate_required(mixed $data, mixed $fields): void
     {
         $missing = array_filter($fields, fn ($f) => empty(trim($data[$f] ?? '')));
         if ($missing) {

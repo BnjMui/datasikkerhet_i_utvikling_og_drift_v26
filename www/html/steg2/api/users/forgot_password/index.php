@@ -20,20 +20,15 @@ if ($method === "GET") {
 }
 
 if ($method === 'POST') {
-    Helpers::validate_required($data, ["mail", "security_answers", "new_password"]);
+    Helpers::validate_required($data, ["mail", "security_answer", "new_password"]);
 
 
     $security_answers = $repository->getSecurityAnswersByMail($data["mail"]);
-    foreach ($data["security_answers"] as $question) {
-        foreach ($security_answers as $security_answer) {
-            if ($question["question_id"] == $security_answer["question_id"]) {
-                if (!password_verify($question["security_answer"], $security_answer["security_answer"])) {
+                if (!password_verify($data["security_answer"], $repository->getSecurityAnswersByMail($data["mail"])->security_answer)){ 
                     Helpers::send_error("Bad Request", 400);
                     exit;
-                }
             }
         }
-    }
 
 
 
@@ -46,7 +41,6 @@ if ($method === 'POST') {
     $user_id = $repository->getUserLoginInfo($data["mail"])->user_id;
     $success = $repository->updatePasswordByUserId($user_id, $hashed_password);
 
-    Helpers::send_success(null, "Password updated", 204);
-}
+    Helpers::send_success(["success" => true], "Success", 200);
 
 Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);
