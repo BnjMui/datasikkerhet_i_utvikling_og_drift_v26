@@ -17,7 +17,6 @@ use DatasikkerhetG7\Models\CreateUserDto;
 use DatasikkerhetG7\Models\Lecturer;
 use DatasikkerhetG7\Models\Message;
 use DatasikkerhetG7\Models\Reply;
-use DatasikkerhetG7\Models\Report;
 use DatasikkerhetG7\Models\Student;
 use DatasikkerhetG7\Models\User;
 use DatasikkerhetG7\Models\UserLogin;
