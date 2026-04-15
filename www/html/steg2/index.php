@@ -11,17 +11,17 @@ use DatasikkerhetG7\Frontend\ApiClient;
 // Hent brukerinfo fra session
 $user = null;
 $role = null;
-$student_courses = null;
+$student_courses = [];
 
 if (isset($_SESSION['session_data'])) {
 
     $user = $_SESSION['session_data'];
     $role = $user["role"];
 
-    $courses = ApiClient::get_courses();
-    if ($user["role"] == "student") {
-        $student_courses = ApiClient::get_student_courses();
-    }
+}
+$courses = ApiClient::get_courses();
+if (isset($user["role"]) && $user["role"] == "student") {
+    $student_courses = ApiClient::get_student_courses();
 }
 
 
@@ -82,7 +82,7 @@ if (isset($_SESSION['session_data'])) {
                     Du har ingen emner tilknyttet din brukerkonto.
                 </p>
             <?php else: ?>
-                <?php if ($user["role"] == "student" && $student_courses): ?>
+                <?php if (isset($user["role"]) && $user["role"] == "student" && $student_courses): ?>
                 <nav aria-label="Emner">
                     <h3>Dine emner</h3>
                     <ul class="emne-liste">
@@ -140,7 +140,7 @@ if (isset($_SESSION['session_data'])) {
                                 </header>
                                 <p class="emne-navn"><?php echo htmlspecialchars($course['course_name']); ?></p>
                                         <?php
-                                    if ($user["role"] == "student") { ?>
+                                    if (isset($user["role"]) && $user["role"] == "student") { ?>
                                     <form method="POST" action="/steg2/register_course.php">
                                         <input type="hidden" name="course_id" value="<?php echo $course["course_id"]; ?>" />
                                             <input type="submit" value="Registrer"/>
@@ -150,7 +150,7 @@ if (isset($_SESSION['session_data'])) {
                             ?>
                                     <p> 
                                         <?php
-                            if ($user["user_id"] == $course["lecturer_id"]) {
+                            if (isset($user["user_id"]) && $user["user_id"] == $course["lecturer_id"]) {
                                 echo "Du underviser dette emnet";
                             }
                             ?>
