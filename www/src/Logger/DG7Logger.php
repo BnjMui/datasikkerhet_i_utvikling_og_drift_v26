@@ -27,7 +27,7 @@ class DG7Logger
         # Push/Stream handler
         #$this->logger->pushHandler(new StreamHandler('php://stdout', Level::Info));
 
-        $transport = new UdpTransport("158.39.288.228", 12201, UdpTransport::CHUNK_SIZE_LAN);
+        $transport = new UdpTransport("158.39.188.228", 12201, UdpTransport::CHUNK_SIZE_LAN);
         $publisher = new Publisher();
         $publisher->addTransport($transport);
 
