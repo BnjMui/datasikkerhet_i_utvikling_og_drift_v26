@@ -199,10 +199,10 @@ class ApiClient
     }
 
     ## Update this
-    public static function change_password($new_password): bool
+    public static function change_password($mail, $password, $new_password): bool
     {
         $user_id_token = $_SESSION["session_data"]["user_id"];
-        $result = self::handleRequest(self::curlHandler("POST", "/users/update_password", ["new_password" => $new_password], ["AUTHENTICATION: $user_id_token"]));
+        $result = self::handleRequest(self::curlHandler("POST", "/users/update_password", ["mail" => $mail, "password" => $password, "new_password" => $new_password], ["AUTHENTICATION: $user_id_token"]));
 
         if ($result === false) {
             return false;

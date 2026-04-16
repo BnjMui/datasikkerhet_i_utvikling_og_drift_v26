@@ -19,7 +19,7 @@ if ($method === 'POST') {
 
     $user_data = $repository->getUserLoginInfo($data["mail"]);
 
-if (!$user_data || !password_verify($data["password"], $user_data["password"])) {
+if (!$user_data || !password_verify($data["password"], $user_data->password)) {
     Helpers::send_error("User with provided mail or password combination not found", 404);
     exit;
     }

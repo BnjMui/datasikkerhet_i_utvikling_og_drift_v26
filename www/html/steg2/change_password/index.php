@@ -10,6 +10,8 @@ $success = false;
 
 // Håndter innlogging
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $mail = $_POST["mail"];
+    $password = $_POST["password"];
     $new_password = $_POST["new_password"];
     $password_matches = $new_password == $_POST["new_password_confirm"];
 
@@ -17,13 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Passordene er ikke like";
     }
     if ($password_matches) {
-        $result = ApiClient::change_password($new_password);
+        $result = ApiClient::change_password($mail, $password, $new_password);
 
-        if (!$result) {
-            $error_message = "Ukjent feil";
+        if ($result) {
+            header("Location: /steg2");
+            exit;
         }
-        header("Location: /steg2");
-        exit;
+        $error_message = "Ukjent feil";
     }
 }
 ?>
@@ -45,15 +47,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h1>Endre passord</h1>
             </header>
 
-            <?php if ($success): ?>
-                <p class="success-message" role="status">
-                    Passord endret!
-                </p>
-            <?php endif; ?>
-
             <form method="POST" action="" class="form-group">
                 <fieldset>
                     <legend>Endre passord</legend>
+                        <label for="mail">E-post *</label>
+                        <input
+                            id="mail"
+                            name="mail"
+                            type="mail"
+                            required
+                            />
+                        <label for="password">Nåværende passord *</label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            required
+                            />
                         <label for="new_password">Nytt passord *</label>
                         <input
                             id="new_password"
@@ -61,7 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             name="new_password"
                             autocomplete="new-password"
                             required
-                            minlength="8">
+                            minlength="8"
+                            />
 
                         <label for="new_password_confirm">Bekreft nytt passord *</label>
                         <input
@@ -70,7 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             name="new_password_confirm"
                             autocomplete="new-password"
                             required
-                            minlength="8">
+                            minlength="8"
+                            />
                 </fieldset>
 
                 <button type="submit">Endre passord</button>

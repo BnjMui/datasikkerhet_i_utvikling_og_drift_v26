@@ -113,32 +113,32 @@ if ($course) {
             <?php if ($course_data): ?>
             <header>
                 <h1>
-                    <?php echo $course_data["course_name"]; ?>
+                    <?php echo htmlspecialchars($course_data["course_name"]); ?>
                 </h1>
                 <p>
-                <?php echo $course_data["course_code"]; ?>
+                <?php echo htmlspecialchars($course_data["course_code"]); ?>
                 </p>
                 </header>
             <section>
                 <h2>Emneansvarlig</h2>
                 <img src="/steg2/register/<?php echo $lecturer["avatar"];?>" width="250"/>
                 <p>
-                    <?php echo $lecturer["first_name"] . " " . $lecturer["last_name"]; ?>
+                    <?php echo htmlspecialchars($lecturer["first_name"] . " " . $lecturer["last_name"]); ?>
                 </p>
             </section>
             <section>
                 <h2>Meldinger</h2>
                 <ul>
-                <?php if ($course["messages"]):
+                <?php if (isset($course["messages"])):
                     foreach ($course["messages"] as $message) { ?>
                     <li>
-                        <h3>Message #ID: <?php echo $message["message_id"]?></h3>
+                        <h3>Message</h3>
                         <article>
                             <p>
-                            <?php echo $message["text"]; ?>
+                            <?php echo htmlspecialchars($message["text"]); ?>
                             </p>
                             <p>
-                            <?php echo $message["created_at"]; ?>
+                            <?php echo htmlspecialchars($message["created_at"]); ?>
                             </p>
                             <?php if (!$user): ?>
                             <form method="POST" action="/steg2/course/post_comment.php">
@@ -182,10 +182,10 @@ if ($course) {
                                 foreach ($message["replies"] as $reply) {
                                     ?>
                             <p>
-                            <?php echo $reply["text"]; ?>
+                            <?php echo htmlspecialchars($reply["text"]); ?>
                             </p>
                             <p>
-                            <?php echo $reply["created_at"]; ?>
+                            <?php echo htmlspecialchars($reply["created_at"]); ?>
                             </p>
                             <?php
                                 }
@@ -196,10 +196,10 @@ if ($course) {
                         <?php foreach ($message["comments"] as $comment) { ?>
                             <article>
                             <p>
-                            <?php echo $comment["text"]; ?>
+                            <?php echo htmlspecialchars($comment["text"]); ?>
                             </p>
                             <p>
-                            <?php echo $comment["created_at"]; ?>
+                            <?php echo htmlspecialchars($comment["created_at"]); ?>
                             </p>
                             </article>
                             <?php } endif ?>
