@@ -1,7 +1,8 @@
 <?php
 
-require_once $_SERVER["DOCUMENT_ROOT"] . "./steg2/bootstrap.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Logger\DG7Logger;
 
 $method = Helpers::get_method();
 $data   = Helpers::get_request_data();
@@ -19,14 +20,25 @@ if ($method === 'POST') {
 
     $user_data = $repository->getUserLoginInfo($data["mail"]);
 
-if (!$user_data || !password_verify($data["password"], $user_data->password)) {
-    Helpers::send_error("User with provided mail or password combination not found", 404);
-    exit;
+    if (!$user_data || !password_verify($data["password"], $user_data->password)) {
+        $logger = new DG7Logger("API");
+        $log = $logger->getLogger();
+
+        $log->warning("Invalid change password attempt", ["used_mail" => $data["mail"]]);
+
+        Helpers::send_error("User with provided mail or password combination not found", 404);
+        exit;
     }
 
     $hashed_password = password_hash($data["new_password"], PASSWORD_BCRYPT);
 
     $success = $repository->updatePasswordByUserId($authenticated["user_id"], $hashed_password);
+    if ($success) {
+        $logger = new DG7Logger("API");
+        $log = $logger->getLogger();
+
+        $log->notice("User password changed", ["user_id" => $user_data->user_id]);
+    }
 
     Helpers::send_success(["success" => true], "Success", 200);
 }

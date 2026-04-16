@@ -2,6 +2,7 @@
 
 require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
+use DatasikkerhetG7\Logger\DG7Logger;
 
 $method = Helpers::get_method();
 $data = Helpers::get_request_data();
@@ -15,6 +16,11 @@ if ($method === "GET") {
 
     $security_questions = $repository->getSecurityQuestionsByMail($data["mail"]);
 
+    $logger = new DG7Logger("API");
+    $log = $logger->getLogger();
+
+    $log->notice("Security questions requested for user requested", ["used_mail" => $data["mail"]]);
+
     Helpers::send_success($security_questions, "Success", 200);
     exit;
 }
@@ -24,11 +30,16 @@ if ($method === 'POST') {
 
 
     $security_answers = $repository->getSecurityAnswersByMail($data["mail"]);
-                if (!password_verify($data["security_answer"], $repository->getSecurityAnswersByMail($data["mail"])->security_answer)){ 
-                    Helpers::send_error("Bad Request", 400);
-                    exit;
-            }
-        }
+    if (!password_verify($data["security_answer"], $repository->getSecurityAnswersByMail($data["mail"])->security_answer)) {
+
+        $logger = new DG7Logger("API");
+        $log = $logger->getLogger();
+
+        $log->warning("Failed forgot password attempt", ["used_mail" => $data["mail"]]);
+        Helpers::send_error("Bad Request", 400);
+        exit;
+    }
+
 
 
 
@@ -41,6 +52,15 @@ if ($method === 'POST') {
     $user_id = $repository->getUserLoginInfo($data["mail"])->user_id;
     $success = $repository->updatePasswordByUserId($user_id, $hashed_password);
 
+    if ($success) {
+        $logger = new DG7Logger("API");
+        $log = $logger->getLogger();
+
+        $log->notice("User password changed", ["user_id" => $user_id]);
+    }
+
     Helpers::send_success(["success" => true], "Success", 200);
+
+}
 
 Helpers::send_response(['success' => false, 'error' => 'Method Not Allowed'], 405);

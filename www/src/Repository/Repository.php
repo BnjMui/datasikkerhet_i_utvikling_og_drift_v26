@@ -135,6 +135,12 @@ class Repository
                 $this->createSecurityQuestion($security_question);
             }
         }
+
+        $logger = new DG7Logger("Repository");
+        $log = $logger->getLogger();
+
+        $log->info("New $userData->role created", ["user_id" => $uid]);
+
         return $result;
     }
 
@@ -460,7 +466,7 @@ class Repository
             $log = $logger->getLogger();
 
             $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
-            
+
             return false;
         }
     }

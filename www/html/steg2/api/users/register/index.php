@@ -88,6 +88,7 @@ if ($method === 'POST') {
             break;
     }
     if ($success) {
+
         Helpers::send_success(["success" => true], "Created", 200);
         exit;
     }

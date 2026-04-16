@@ -1,7 +1,8 @@
 <?php
+
 require_once $_SERVER["DOCUMENT_ROOT"] . "/steg2/bootstrap.php";
 use DatasikkerhetG7\Api\Helpers;
-
+use DatasikkerhetG7\Logger\DG7Logger;
 
 $method = Helpers::get_method();
 $data = Helpers::get_request_data();
@@ -21,6 +22,12 @@ if ($method === "GET") {
         if (isset($data["pin_code"])) {
             $course_pin = $repository->getCoursePin($data["course_id"]);
             if ($data["pin_code"] != $course_pin) {
+
+                $logger = new DG7Logger("API_Login");
+                $log = $logger->getLogger();
+
+                $log->notice("Invalid course pin attempt", ["course_id" => $data["course_id"]]);
+
                 Helpers::send_error("Unauthorized", 401);
             }
         }

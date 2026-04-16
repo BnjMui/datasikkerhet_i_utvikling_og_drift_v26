@@ -23,7 +23,7 @@ class DG7Logger
         $this->logger = new Logger($name);
 
         # Push/Stream handler
-        $this->logger->pushHandler(new StreamHandler('php://stdout', Level::Warning));
+        $this->logger->pushHandler(new StreamHandler('php://stdout', Level::Info));
 
 
         # Other settings?
