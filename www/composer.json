@@ -5,6 +5,7 @@
         }
     },
     "require": {
-        "monolog/monolog": "^3.10"
+        "monolog/monolog": "^3.10",
+        "graylog2/gelf-php": "^2.0"
     }
 }
