@@ -4,6 +4,7 @@ namespace DatasikkerhetG7\Repository;
 
 require __DIR__ . "/../../vendor/autoload.php";
 
+use DatasikkerhetG7\Logger\DG7Logger;
 use DatasikkerhetG7\Models\BaseMessageReply;
 use DatasikkerhetG7\Models\Comment;
 use DatasikkerhetG7\Models\Course;
@@ -156,6 +157,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -179,6 +186,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -198,6 +211,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -315,6 +334,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -352,6 +377,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -385,6 +416,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }
@@ -418,6 +455,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+            
             return false;
         }
     }
@@ -439,6 +482,12 @@ class Repository
             return $this->dbh->commit();
         } catch (PDOException $e) {
             $this->dbh->rollBack();
+
+            $logger = new DG7Logger("Repository");
+            $log = $logger->getLogger();
+
+            $log->error($e->getMessage(), ["error_code" => $e->getCode()]);
+
             return false;
         }
     }

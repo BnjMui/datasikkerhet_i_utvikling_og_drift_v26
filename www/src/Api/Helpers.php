@@ -3,6 +3,7 @@
 namespace DatasikkerhetG7\Api;
 
 require __DIR__ . "/../../vendor/autoload.php";
+use DatasikkerhetG7\Logger\DG7Logger;
 use DatasikkerhetG7\Repository\Repository;
 
 // api/helpers.php
@@ -74,6 +75,11 @@ class Helpers
     {
         $missing = array_filter($fields, fn ($f) => empty(trim($data[$f] ?? '')));
         if ($missing) {
+            $logger = new DG7Logger("data_validation");
+            $log = $logger->getLogger();
+
+            $log->warning("Data validation failed", ["expected_data_fields" => $fields, "received_data" => $data]);
+
             self::send_error('Manglende felter: ' . implode(', ', $missing), 400);
             exit;
         }
@@ -104,7 +110,12 @@ class Helpers
                 "role" => $user_id->role
             ];
         } else {
-            send_error("Unauthorized", 401);
+            $logger = new DG7Logger("authentication");
+            $log = $logger->getLogger();
+
+            $log->warning("Failed authentication attempt, using token: ", ["user_token" => $user_token]);
+
+            self::send_error("Unauthorized", 401);
             return null;
         }
     }
