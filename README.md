@@ -3,6 +3,8 @@
 
 ## Steg2
 
+Steg2 source code is located in /www
+
 Changes from steg1 to steg2
 
 ### Database
